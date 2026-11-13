@@ -137,10 +137,22 @@ class YoutubeExchangeController extends Controller
             }
             $video->save();
 
-            // Award points
+            // Award points with VIP multiplier
+            $awardedPoints = $video->reward_points;
+            try {
+                if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)) {
+                    $multiplier = app(\App\Services\Billing\SubscriptionEntitlementService::class)->activePtsMultiplierForUserId(Auth::id());
+                    if ($multiplier > 1.0) {
+                        $awardedPoints = round($awardedPoints * $multiplier, 2);
+                    }
+                }
+            } catch (\Throwable) {
+                // Ignore
+            }
+
             $pointLedger->award(
                 Auth::user(),
-                $video->reward_points,
+                $awardedPoints,
                 'yt_view_reward',
                 'yt_view_reward',
                 'yt_video',
@@ -151,8 +163,8 @@ class YoutubeExchangeController extends Controller
 
             return response()->json([
                 'success' => true, 
-                'message' => __('View verified. You have earned :points pts!', ['points' => $video->reward_points]),
-                'points' => $video->reward_points
+                'message' => __('View verified. You have earned :points pts!', ['points' => $awardedPoints]),
+                'points' => $awardedPoints
             ]);
 
         } catch (DecryptException $e) {

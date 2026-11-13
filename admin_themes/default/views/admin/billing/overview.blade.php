@@ -103,6 +103,34 @@
                     <i class="feather-trending-up fs-3"></i>
                 </div>
             </div>
+
+            {{-- Estimated ARR --}}
+            <div class="admin-stat-card d-flex align-items-center justify-content-between p-3">
+                <div>
+                    <span class="admin-stat-label mb-1">{{ __('messages.billing_summary_estimated_arr') }}</span>
+                    <span class="admin-stat-value text-primary fs-4">
+                        {{ number_format((float) ($summary['estimated_arr'] ?? 0), 2) }}
+                        <small class="fs-12 fw-normal text-muted ms-1">{{ $settings['base_currency_code'] ?? 'USD' }}</small>
+                    </span>
+                </div>
+                <div class="bg-soft-primary text-primary rounded-4 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="feather-pie-chart fs-3"></i>
+                </div>
+            </div>
+
+            {{-- ARPU & Conversion Rate --}}
+            <div class="admin-stat-card d-flex align-items-center justify-content-between p-3">
+                <div>
+                    <span class="admin-stat-label mb-1">{{ __('messages.billing_summary_arpu') }}</span>
+                    <span class="admin-stat-value text-success fs-4">
+                        {{ number_format((float) ($summary['arpu'] ?? 0), 2) }}
+                        <small class="fs-11 fw-normal text-muted ms-1">({{ $summary['conversion_rate'] ?? 0 }}% Conv)</small>
+                    </span>
+                </div>
+                <div class="bg-soft-success text-success rounded-4 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <i class="feather-dollar-sign fs-3"></i>
+                </div>
+            </div>
         </div>
 
         {{-- Split Content Grid --}}

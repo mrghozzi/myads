@@ -154,6 +154,182 @@
             </div>
         @endforelse
     </div>
+
+    {{-- Comparison Matrix --}}
+    @if($plans->isNotEmpty())
+        <div class="widget-box" style="margin-top: 36px; overflow: hidden;">
+            <div class="widget-box-content" style="padding: 28px;">
+                <div style="margin-bottom: 24px; text-align: center;">
+                    <p class="widget-box-title" style="font-size: 22px; margin-bottom: 8px;">{{ __('messages.billing_comparison_title') }}</p>
+                    <p class="user-status-text" style="max-width: 600px; margin: 0 auto;">{{ __('messages.billing_comparison_subtitle') }}</p>
+                </div>
+
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover align-middle mb-0" style="width: 100%; border-collapse: separate; border-spacing: 0; text-align: center;">
+                        <thead>
+                            <tr style="background: rgba(97, 93, 250, 0.05);">
+                                <th style="text-align: start; padding: 16px; border-bottom: 2px solid rgba(97, 93, 250, 0.15); font-size: 14px;">{{ __('messages.billing_feature_name') }}</th>
+                                <th style="padding: 16px; border-bottom: 2px solid rgba(97, 93, 250, 0.15); font-size: 14px;">{{ __('messages.billing_free_member') }}</th>
+                                @foreach($plans as $plan)
+                                    <th style="padding: 16px; border-bottom: 2px solid {{ $plan->accent_color ?: '#615dfa' }}; font-size: 15px; color: {{ $plan->accent_color ?: '#615dfa' }};">
+                                        {{ $plan->name }}
+                                        <div style="font-size: 13px; font-weight: normal; color: var(--text-color-light); margin-top: 4px;">
+                                            {{ number_format((float) $plan->base_price, 2) }} {{ $baseCurrencyCode }}
+                                        </div>
+                                    </th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- Row: Ad-Free --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-shield-alt" style="color: #615dfa; margin-right: 6px;"></i> {{ __('messages.billing_comparison_ad_free') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #ef4444; border-bottom: 1px solid rgba(0,0,0,0.06);"><i class="fa fa-times-circle"></i></td>
+                                @foreach($plans as $plan)
+                                    @php($adFree = !empty(data_get($plan->entitlements, 'ad_free')))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                        @if($adFree)
+                                            <span style="color: #10b981; font-weight: bold;"><i class="fa fa-check-circle"></i> 100% Ad-Free</span>
+                                        @else
+                                            <span style="color: #94a3b8;"><i class="fa fa-times-circle"></i></span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: PTS Multiplier --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-bolt" style="color: #f59e0b; margin-right: 6px;"></i> {{ __('messages.billing_comparison_pts_multiplier') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #64748b; border-bottom: 1px solid rgba(0,0,0,0.06);">1.0x (Standard)</td>
+                                @foreach($plans as $plan)
+                                    @php($multiplier = (float) data_get($plan->entitlements, 'pts_multiplier', 1.0))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); font-weight: 700; color: {{ $multiplier > 1.0 ? '#2563eb' : '#64748b' }};">
+                                        {{ $multiplier > 1.0 ? $multiplier . 'x Boost' : '1.0x' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Exchange Priority --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-rocket" style="color: #ec4899; margin-right: 6px;"></i> {{ __('messages.billing_comparison_exchange_priority') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #ef4444; border-bottom: 1px solid rgba(0,0,0,0.06);"><i class="fa fa-times-circle"></i></td>
+                                @foreach($plans as $plan)
+                                    @php($priority = !empty(data_get($plan->entitlements, 'exchange_priority')))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                        @if($priority)
+                                            <span style="color: #10b981; font-weight: bold;"><i class="fa fa-check-circle"></i> Priority Surge</span>
+                                        @else
+                                            <span style="color: #94a3b8;"><i class="fa fa-times-circle"></i></span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Store Commission --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-store" style="color: #06b6d4; margin-right: 6px;"></i> {{ __('messages.billing_comparison_store_commission') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #64748b; border-bottom: 1px solid rgba(0,0,0,0.06);">Standard (20%)</td>
+                                @foreach($plans as $plan)
+                                    @php($comm = data_get($plan->entitlements, 'store_commission_pct', 0))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); font-weight: 700; color: #10b981;">
+                                        {{ $comm }}% Commission
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Verified Checkmark --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-check-circle" style="color: #3b82f6; margin-right: 6px;"></i> {{ __('messages.billing_comparison_verified_badge') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #ef4444; border-bottom: 1px solid rgba(0,0,0,0.06);"><i class="fa fa-times-circle"></i></td>
+                                @foreach($plans as $plan)
+                                    @php($verified = !empty(data_get($plan->entitlements, 'subscription_verified_badge')))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                        @if($verified)
+                                            <span style="color: #2563eb; font-weight: bold;"><i class="fa fa-check-circle"></i> Included</span>
+                                        @else
+                                            <span style="color: #94a3b8;"><i class="fa fa-times-circle"></i></span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Custom Profile Badge --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-tag" style="color: #8b5cf6; margin-right: 6px;"></i> {{ __('messages.billing_comparison_profile_badge') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #ef4444; border-bottom: 1px solid rgba(0,0,0,0.06);"><i class="fa fa-times-circle"></i></td>
+                                @foreach($plans as $plan)
+                                    @php($badgeLabel = trim((string) data_get($plan->entitlements, 'profile_badge_label', '')))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                        @if($badgeLabel !== '')
+                                            <span style="display: inline-block; padding: 3px 10px; border-radius: 999px; background: {{ data_get($plan->entitlements, 'profile_badge_color', '#615dfa') }}18; color: {{ data_get($plan->entitlements, 'profile_badge_color', '#615dfa') }}; font-weight: 700; font-size: 12px;">
+                                                {{ $badgeLabel }}
+                                            </span>
+                                        @else
+                                            <span style="color: #94a3b8;"><i class="fa fa-times-circle"></i></span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Max Upload Size --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-cloud-upload-alt" style="color: #64748b; margin-right: 6px;"></i> {{ __('messages.billing_comparison_max_upload') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #64748b; border-bottom: 1px solid rgba(0,0,0,0.06);">25 MB</td>
+                                @foreach($plans as $plan)
+                                    @php($uploadSize = data_get($plan->entitlements, 'max_upload_size_mb', 25))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); font-weight: 700;">
+                                        {{ $uploadSize }} MB
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Promotion Discount --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                    <i class="fa fa-percent" style="color: #10b981; margin-right: 6px;"></i> {{ __('messages.billing_comparison_promotion_discount') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #64748b; border-bottom: 1px solid rgba(0,0,0,0.06);">0%</td>
+                                @foreach($plans as $plan)
+                                    @php($discount = data_get($plan->entitlements, 'status_promotion_discount_pct', 0))
+                                    <td style="padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); font-weight: 700; color: {{ $discount > 0 ? '#10b981' : '#64748b' }};">
+                                        {{ $discount > 0 ? $discount . '% OFF' : '-' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+
+                            {{-- Row: Bonus Points --}}
+                            <tr>
+                                <td style="text-align: start; padding: 14px 16px; font-weight: 600;">
+                                    <i class="fa fa-coins" style="color: #f59e0b; margin-right: 6px;"></i> {{ __('messages.billing_comparison_bonus_pts') }}
+                                </td>
+                                <td style="padding: 14px 16px; color: #64748b;">0 PTS</td>
+                                @foreach($plans as $plan)
+                                    @php($bonusPts = data_get($plan->entitlements, 'bonus_pts', 0))
+                                    <td style="padding: 14px 16px; font-weight: 800; color: #f59e0b;">
+                                        {{ $bonusPts > 0 ? '+' . number_format($bonusPts) . ' PTS' : '-' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection
 

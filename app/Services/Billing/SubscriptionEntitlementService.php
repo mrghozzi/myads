@@ -68,8 +68,71 @@ class SubscriptionEntitlementService
             'bonus_nlink' => 0,
             'bonus_nsmart' => 0,
             'status_promotion_discount_pct' => 0,
+            'ad_free' => false,
+            'pts_multiplier' => 1.0,
+            'store_commission_pct' => 0,
+            'exchange_priority' => false,
+            'featured_directory_badge' => false,
+            'max_upload_size_mb' => 25,
             'extra_included_benefits' => [],
         ], (array) ($subscription?->entitlements_snapshot ?? []));
+    }
+
+    public function hasAdFreeForUser(User|int|null $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        $userId = $user instanceof User ? (int) $user->id : (int) $user;
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+
+        return (bool) ($entitlements['ad_free'] ?? false);
+    }
+
+    public function activePtsMultiplierForUserId(int $userId): float
+    {
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+        $multiplier = (float) ($entitlements['pts_multiplier'] ?? 1.0);
+
+        return max(1.0, min(10.0, $multiplier));
+    }
+
+    public function hasExchangePriorityForUserId(int $userId): bool
+    {
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+
+        return (bool) ($entitlements['exchange_priority'] ?? false);
+    }
+
+    public function hasFeaturedDirectoryBadgeForUserId(int $userId): bool
+    {
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+
+        return (bool) ($entitlements['featured_directory_badge'] ?? false);
+    }
+
+    public function maxUploadSizeMbForUserId(int $userId, int $default = 25): int
+    {
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+        $size = (int) ($entitlements['max_upload_size_mb'] ?? $default);
+
+        return max($default, $size);
+    }
+
+    public function storeCommissionPctForUserId(int $userId, float $default = 20.0): float
+    {
+        $sub = $this->activeSubscriptionFor($userId);
+        if (!$sub) {
+            return $default;
+        }
+
+        $entitlements = $this->entitlementsForSubscription($sub);
+        if (!isset($entitlements['store_commission_pct'])) {
+            return $default;
+        }
+
+        return max(0.0, min(100.0, (float) $entitlements['store_commission_pct']));
     }
 
     public function activeDiscountPercentageForUserId(int $userId): float
@@ -141,6 +204,30 @@ class SubscriptionEntitlementService
 
         if ((float) ($normalized['status_promotion_discount_pct'] ?? 0) > 0) {
             $benefits[] = __('messages.billing_discount_benefit', ['amount' => $normalized['status_promotion_discount_pct']]);
+        }
+
+        if (!empty($normalized['ad_free'])) {
+            $benefits[] = __('messages.billing_ad_free_benefit');
+        }
+
+        if ((float) ($normalized['pts_multiplier'] ?? 1.0) > 1.0) {
+            $benefits[] = __('messages.billing_pts_multiplier_benefit', ['amount' => $normalized['pts_multiplier']]);
+        }
+
+        if (!empty($normalized['exchange_priority'])) {
+            $benefits[] = __('messages.billing_exchange_priority_benefit');
+        }
+
+        if (isset($normalized['store_commission_pct']) && (float) $normalized['store_commission_pct'] < 20.0) {
+            $benefits[] = __('messages.billing_store_commission_benefit', ['amount' => $normalized['store_commission_pct']]);
+        }
+
+        if (!empty($normalized['featured_directory_badge'])) {
+            $benefits[] = __('messages.billing_featured_directory_benefit');
+        }
+
+        if ((int) ($normalized['max_upload_size_mb'] ?? 25) > 25) {
+            $benefits[] = __('messages.billing_max_upload_size_benefit', ['size' => $normalized['max_upload_size_mb']]);
         }
 
         foreach ((array) ($normalized['extra_included_benefits'] ?? []) as $benefit) {

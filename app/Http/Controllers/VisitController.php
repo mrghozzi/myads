@@ -172,7 +172,30 @@ class VisitController extends Controller
             $query->whereNotIn('id', $recentSiteIds);
         }
 
-        $site = $query->inRandomOrder()->first();
+        $site = null;
+        try {
+            // Prioritize sites whose owners have active exchange_priority entitlement
+            if (class_exists(\App\Models\MemberSubscription::class)) {
+                $priorityUserIds = \App\Models\MemberSubscription::query()
+                    ->where('status', 'active')
+                    ->where(function ($q) {
+                        $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+                    })
+                    ->where('entitlements_snapshot->exchange_priority', true)
+                    ->pluck('user_id')
+                    ->toArray();
+
+                if (!empty($priorityUserIds)) {
+                    $site = (clone $query)->whereIn('uid', $priorityUserIds)->inRandomOrder()->first();
+                }
+            }
+        } catch (\Throwable) {
+            $site = null;
+        }
+
+        if (!$site) {
+            $site = $query->inRandomOrder()->first();
+        }
 
         // If no unvisited sites available, try without the exclusion filter
         if (!$site) {
@@ -313,6 +336,16 @@ class VisitController extends Controller
 
             // Credit viewer: award PTS via PointLedgerService for proper ledger tracking
             $pointsReward = VisitExchangeSettings::pointsReward();
+            try {
+                if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)) {
+                    $multiplier = app(\App\Services\Billing\SubscriptionEntitlementService::class)->activePtsMultiplierForUserId($user->id);
+                    if ($multiplier > 1.0) {
+                        $pointsReward = round($pointsReward * $multiplier, 2);
+                    }
+                }
+            } catch (\Throwable) {
+                // Ignore multiplier errors
+            }
             $vuReward = VisitExchangeSettings::vuReward();
 
             app(PointLedgerService::class)->award(

@@ -50,17 +50,26 @@ class AdminBillingController extends Controller
                     ->take(8)
                     ->get();
 
+                $monthlyRev = (float) BillingOrder::query()
+                    ->where('status', BillingOrder::STATUS_PAID)
+                    ->where('paid_at', '>=', now()->subDays(30))
+                    ->sum('base_amount');
+                $activeSubs = \App\Models\MemberSubscription::query()->where('status', 'active')->count();
+                $totalUsers = \App\Models\User::count();
+                $arpu = $activeSubs > 0 ? round($monthlyRev / $activeSubs, 2) : 0;
+                $convRate = $totalUsers > 0 ? round(($activeSubs / $totalUsers) * 100, 2) : 0;
+
                 $summary = [
                     'active_plans' => SubscriptionPlan::query()->where('is_active', true)->count(),
-                    'active_subscriptions' => \App\Models\MemberSubscription::query()->where('status', 'active')->count(),
+                    'active_subscriptions' => $activeSubs,
                     'pending_bank_transfers' => BillingOrder::query()
                         ->where('gateway', 'bank_transfer')
                         ->where('status', BillingOrder::STATUS_PENDING_REVIEW)
                         ->count(),
-                    'monthly_revenue' => (float) BillingOrder::query()
-                        ->where('status', BillingOrder::STATUS_PAID)
-                        ->where('paid_at', '>=', now()->subDays(30))
-                        ->sum('base_amount'),
+                    'monthly_revenue' => $monthlyRev,
+                    'estimated_arr' => round($monthlyRev * 12, 2),
+                    'arpu' => $arpu,
+                    'conversion_rate' => $convRate,
                 ];
             } catch (\Throwable) {
                 $recentOrders = collect();
@@ -566,6 +575,12 @@ class AdminBillingController extends Controller
             'bonus_nlink' => 'nullable|numeric|min:0|max:999999',
             'bonus_nsmart' => 'nullable|numeric|min:0|max:999999',
             'status_promotion_discount_pct' => 'nullable|numeric|min:0|max:95',
+            'ad_free' => 'nullable|boolean',
+            'pts_multiplier' => 'nullable|numeric|min:1|max:10',
+            'store_commission_pct' => 'nullable|numeric|min:0|max:100',
+            'exchange_priority' => 'nullable|boolean',
+            'featured_directory_badge' => 'nullable|boolean',
+            'max_upload_size_mb' => 'nullable|integer|min:10|max:1000',
             'extra_included_benefits_text' => 'nullable|string|max:5000',
         ]);
 

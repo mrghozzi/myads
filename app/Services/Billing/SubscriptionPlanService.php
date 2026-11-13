@@ -18,6 +18,12 @@ class SubscriptionPlanService
         'bonus_nlink',
         'bonus_nsmart',
         'status_promotion_discount_pct',
+        'ad_free',
+        'pts_multiplier',
+        'store_commission_pct',
+        'exchange_priority',
+        'featured_directory_badge',
+        'max_upload_size_mb',
         'extra_included_benefits',
     ];
 
@@ -121,6 +127,12 @@ class SubscriptionPlanService
             'bonus_nlink' => 0,
             'bonus_nsmart' => 0,
             'status_promotion_discount_pct' => 0,
+            'ad_free' => false,
+            'pts_multiplier' => 1.0,
+            'store_commission_pct' => 0,
+            'exchange_priority' => false,
+            'featured_directory_badge' => false,
+            'max_upload_size_mb' => 25,
             'extra_included_benefits' => [],
         ];
     }
@@ -151,8 +163,11 @@ class SubscriptionPlanService
             $submitted = $values[$key] ?? $defaults[$key] ?? $entitlements[$key];
             $entitlements[$key] = match (true) {
                 in_array($key, ['profile_badge_label', 'profile_badge_color'], true) => trim((string) $submitted),
-                $key === 'subscription_verified_badge' => !empty($submitted),
+                in_array($key, ['subscription_verified_badge', 'ad_free', 'exchange_priority', 'featured_directory_badge'], true) => !empty($submitted),
                 $key === 'extra_included_benefits' => $this->normalizeBulletList($submitted),
+                $key === 'pts_multiplier' => max(1.0, round((float) $submitted, 2)),
+                $key === 'max_upload_size_mb' => max(10, (int) $submitted),
+                $key === 'store_commission_pct' => max(0, min(100, round((float) $submitted, 2))),
                 default => max(0, round((float) $submitted, 2)),
             };
         }

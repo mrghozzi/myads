@@ -28,6 +28,23 @@
             <div class="alert alert-info" role="alert" style="margin-bottom: 20px;">{{ __('messages.billing_system_disabled_member_notice') }}</div>
         @endif
 
+        @if($currentSubscription && $currentSubscription->ends_at && now()->diffInDays($currentSubscription->ends_at, false) <= 7 && now()->diffInDays($currentSubscription->ends_at, false) >= 0)
+            <div class="alert alert-warning" style="display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; border-left: 5px solid #f59e0b; background: rgba(245, 158, 11, 0.08); padding: 18px 24px; border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa fa-exclamation-triangle" style="font-size: 24px; color: #f59e0b;"></i>
+                    <div>
+                        <strong style="color: var(--heading-color); font-size: 15px;">{{ __('messages.billing_renewal_alert_title') }}</strong>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-color);">
+                            {{ __('messages.billing_renewal_alert_body', ['plan' => $currentSubscription->plan_name, 'days' => max(1, (int) now()->diffInDays($currentSubscription->ends_at))]) }}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ $plansUrl }}" class="button primary" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; font-weight: 700;">
+                    <i class="fa fa-sync-alt" style="margin-right: 6px;"></i> {{ __('messages.billing_renew_now') }}
+                </a>
+            </div>
+        @endif
+
         <div class="widget-box" style="margin-bottom: 20px;">
             <div class="widget-box-content" style="padding: 28px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">

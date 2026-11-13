@@ -311,6 +311,81 @@
                                     <input type="text" name="profile_badge_label" class="form-control" value="{{ old('profile_badge_label', $entitlementDefaults['profile_badge_label'] ?? '') }}" placeholder="{{ __('messages.billing_profile_badge_placeholder') }}" style="border-radius: 10px;">
                                 </div>
 
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_pts_multiplier_field') }}</label>
+                                    <input type="number" step="0.1" min="1" max="10" name="pts_multiplier" class="form-control" value="{{ old('pts_multiplier', $entitlementDefaults['pts_multiplier'] ?? 1.0) }}" style="border-radius: 10px;">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_store_commission_field') }}</label>
+                                    <div class="input-group">
+                                        <input type="number" step="0.5" min="0" max="100" name="store_commission_pct" class="form-control" value="{{ old('store_commission_pct', $entitlementDefaults['store_commission_pct'] ?? 0) }}" style="border-radius: 10px 0 0 10px;">
+                                        <span class="input-group-text bg-white text-muted" style="border-radius: 0 10px 10px 0;">%</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_max_upload_size_field') }}</label>
+                                    <div class="input-group">
+                                        <input type="number" min="10" max="1000" name="max_upload_size_mb" class="form-control" value="{{ old('max_upload_size_mb', $entitlementDefaults['max_upload_size_mb'] ?? 25) }}" style="border-radius: 10px 0 0 10px;">
+                                        <span class="input-group-text bg-white text-muted" style="border-radius: 0 10px 10px 0;">MB</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_badge_color_field') }}</label>
+                                    <input type="color" name="profile_badge_color" class="form-control form-control-color border w-100" value="{{ old('profile_badge_color', $entitlementDefaults['profile_badge_color'] ?? '#615dfa') }}" style="border-radius: 10px; height: 38px;">
+                                </div>
+
+                                {{-- Advanced VIP Toggles --}}
+                                <div class="col-12 mt-2">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-3 transition-all d-flex align-items-center justify-content-between" style="background: var(--admin-premium-surface-alt); border: 1px solid var(--admin-premium-border);">
+                                                <label class="fw-bold text-dark fs-12 mb-0 cursor-pointer" for="ad_free">
+                                                    <i class="feather-shield text-primary me-1"></i> {{ __('messages.billing_ad_free_field') }}
+                                                </label>
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input shadow-sm" type="checkbox" name="ad_free" id="ad_free" value="1" @checked(old('ad_free', !empty($entitlementDefaults['ad_free'])))>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-3 transition-all d-flex align-items-center justify-content-between" style="background: var(--admin-premium-surface-alt); border: 1px solid var(--admin-premium-border);">
+                                                <label class="fw-bold text-dark fs-12 mb-0 cursor-pointer" for="exchange_priority">
+                                                    <i class="feather-zap text-warning me-1"></i> {{ __('messages.billing_exchange_priority_field') }}
+                                                </label>
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input shadow-sm" type="checkbox" name="exchange_priority" id="exchange_priority" value="1" @checked(old('exchange_priority', !empty($entitlementDefaults['exchange_priority'])))>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-3 transition-all d-flex align-items-center justify-content-between" style="background: var(--admin-premium-surface-alt); border: 1px solid var(--admin-premium-border);">
+                                                <label class="fw-bold text-dark fs-12 mb-0 cursor-pointer" for="subscription_verified_badge">
+                                                    <i class="feather-check-circle text-info me-1"></i> {{ __('messages.billing_verified_badge_benefit') }}
+                                                </label>
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input shadow-sm" type="checkbox" name="subscription_verified_badge" id="subscription_verified_badge" value="1" @checked(old('subscription_verified_badge', !empty($entitlementDefaults['subscription_verified_badge'])))>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-3 transition-all d-flex align-items-center justify-content-between" style="background: var(--admin-premium-surface-alt); border: 1px solid var(--admin-premium-border);">
+                                                <label class="fw-bold text-dark fs-12 mb-0 cursor-pointer" for="featured_directory_badge">
+                                                    <i class="feather-award text-success me-1"></i> {{ __('messages.billing_featured_directory_field') }}
+                                                </label>
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input shadow-sm" type="checkbox" name="featured_directory_badge" id="featured_directory_badge" value="1" @checked(old('featured_directory_badge', !empty($entitlementDefaults['featured_directory_badge'])))>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-12">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_plan_highlights_title') }}</label>
                                     <textarea name="extra_included_benefits_text" class="form-control" rows="3" placeholder="{{ __('messages.billing_extra_included_benefits_placeholder') }}" style="border-radius: 10px;">{{ $extraIncludedBenefitsText }}</textarea>

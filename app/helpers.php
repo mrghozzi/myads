@@ -93,6 +93,17 @@ if (!function_exists('ads_site')) {
      */
     function ads_site($id)
     {
+        if (auth()->check()) {
+            try {
+                if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)
+                    && app(\App\Services\Billing\SubscriptionEntitlementService::class)->hasAdFreeForUser(auth()->id())) {
+                    return '';
+                }
+            } catch (\Throwable) {
+                // Ignore entitlement check failures
+            }
+        }
+
         static $adsCache = [];
 
         if (array_key_exists($id, $adsCache)) {
