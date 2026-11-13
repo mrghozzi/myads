@@ -51,10 +51,20 @@
           "id": 42,
           "username": "developer",
           "name": "Developer Name",
-          "avatar_url": "https://domain.com/upload/avatar.png"
+          "avatar_url": "https://domain.com/upload/avatar.png",
+          "subscription_badge": {
+              "label": "VIP PRO",
+              "color": "#10b981"
+          }
       }
   }
   ```
+
+**جسر مصادقة صفحات الويب المدمجة للهاتف (`AuthenticateMobileWebViewToken`):**  
+عندما يقوم تطبيق الهاتف (Flutter `myads_app`) أو أي Webview مدمج بفتح صفحات المنصة الموثقة (مثل `/billing`, `/plans`, `/support`)، فإنه يمرر توكن Sanctum عبر ترويسة `Authorization: Bearer {token}` أو عبر معامل الرابط `?auth_token={token}`. يعمل الـ Middleware الذكي `AuthenticateMobileWebViewToken` بأولوية متقدمة قبل حزمة `AuthenticatesRequests` في مسار الويب، فيقوم تلقائياً بالتحقق من التوكن وتسجيل دخول العضو في الجلسة القياسية (`Auth::guard('web')->login($user)`). يضمن ذلك فتح شاشات الاشتراكات والدعم داخل التطبيق فورياً وبدون إعادة توجيه المستخدم لصفحة تسجيل الدخول.
+
+**شارات الاشتراك المميز VIP في موارد الـ API:**  
+تحتوي كافة كائنات الأعضاء المعادة عبر `UserResource` و `UserProfileResource` ومكونات المنشورات والتعليقات تلقائياً على حقل `subscription_badge` (`{"label": "...", "color": "..."}` أو `null`)، مما يمكن تطبيقات الهاتف من إظهار شارات الاشتراك الملونة (Badge Pills) بجانب أسماء الناشرين في الخلاصة والملفات الشخصية.
 
 ### ب. قواعد حدود معدل الطلبات (Rate Limiting)
 تتم حماية نقاط النهاية العامة والمصادق عليها بمحددات معدل الطلبات عبر نافذة زمنية منزلقة:
@@ -844,6 +854,252 @@ $$\text{مفتوح (Open)} \longrightarrow \text{تمت الترسية (Awarded)
 - `POST /admin/support/topics/{id}/pin`: تثبيت/إلغاء تثبيت الموضوع.
 - `POST /admin/support/topics/{id}/lock`: قفل/فتح النقاش على الموضوع.
 - `MATCH ['POST', 'DELETE'] /admin/support/topics/{id}`: حذف موضوع الدعم.
+
+---
+
+### ع. منظومة المجموعات التفاعلية والإشراف المجتمعي (Community Groups API - v4.7.0) (`/api/groups/*`)
+
+تتيح واجهة المجموعات لتطبيق الهاتف المحمول (`myads_app`) والواجهات المعتمدة استكشاف المجموعات، الانضمام إليها، النشر بداخلها، وإدارتها مجتمعياً وإشرافياً.
+
+تتطلب جميع نقاط النهاية ترويسة المفتاح العام `X-API-KEY` وترويسة التوكن `Authorization: Bearer {token}`.
+
+#### 1. استكشاف المجموعات والتفاصيل
+- `GET /api/groups`: استعراض قائمة المجموعات مع التصفح بالصفحات والبحث وفلترة التصنيفات والترتيب.
+  - **معلمات الاستعلام:**
+    - `search`: (اختياري، نص) البحث بالاسم أو الوصف.
+    - `category`: (اختياري) الفلترة حسب التصنيف: `technology`, `business`, `crypto`, `marketing`, `design`, `gaming`, `education`, `entertainment`, `community`, `other`.
+    - `sort`: (اختياري) `trending` (افتراضي)، `members`، `active`، `newest`.
+    - `per_page`: (اختياري، افتراضي: 15).
+  - **الاستجابة:** قائمة مجموعات مهيأة عبر `GroupResource`.
+
+- `GET /api/groups/my`: قائمة المجموعات التي انضم إليها المستخدم أو يملكها مع تفاصيل رتبته.
+
+- `POST /api/groups`: إنشاء مجموعة مجتمعية جديدة.
+  - **الحمولة:**
+    ```json
+    {
+      "name": "مجموعة مطوري الويب",
+      "slug": "web-developers-group",
+      "category": "technology",
+      "privacy": "public",
+      "posting_permission": "all_members",
+      "join_fee_pts": 0,
+      "short_description": "مجموعة مخصصة لنقاشات تطوير الويب وتصميم المواقع.",
+      "description": "وصف تفصيلي شامل يدعم Markdown...",
+      "rules_markdown": "1. الاحترام المتبادل\n2. يمنع السبام والمحتوى المضلل."
+    }
+    ```
+  - **الاستجابة:** `HTTP 201 Created` مع كائن المجموعة المنشأة.
+
+- `GET /api/groups/{id_or_slug}`: استرجاع الملف التعريفي الكامل للمجموعة وحالة العضوية وصلاحيات المستخدم السياقية.
+  - **المعلمات:** المعرف الرقمي `id` أو الاسم اللطيف `slug`.
+  - **مثال الاستجابة:**
+    ```json
+    {
+      "id": 12,
+      "name": "مجموعة مطوري الويب",
+      "slug": "web-developers-group",
+      "category": "technology",
+      "privacy": "public",
+      "posting_permission": "all_members",
+      "join_fee_pts": 0,
+      "members_count": 48,
+      "posts_count": 120,
+      "avatar_url": "https://domain.com/storage/groups/avatar_xxx.webp",
+      "cover_url": "https://domain.com/storage/groups/cover_xxx.webp",
+      "membership": {
+        "is_member": true,
+        "role": "moderator",
+        "status": "active"
+      },
+      "permissions": {
+        "can_view_content": true,
+        "can_post": true,
+        "can_moderate": true,
+        "can_manage": false
+      }
+    }
+    ```
+
+- `PUT /api/groups/{id}`: تحديث إعدادات المجموعة (للمالك والإدارة فقط).
+- `DELETE /api/groups/{id}`: حذف المجموعة بأمان مع تنظيف منشوراتها ومواضيع المنتدى وأعضائها وصورها المرتبطة.
+
+#### 2. إدارة العضوية والإشراف
+- `POST /api/groups/{id}/join`: الانضمام للمجموعة العامة أو إرسال طلب انضمام للمجموعة الخاصة. (في المجموعات المدفوعة بنقاط `join_fee_pts > 0`، يتم فحص رصيد العضو وخصم الرسوم وتحويلها تلقائياً لمالك المجموعة).
+- `POST /api/groups/{id}/leave`: مغادرة المجموعة (يجب على المالك التنازل عن الملكية أو حذف المجموعة أولاً).
+- `GET /api/groups/{id}/members`: قائمة أعضاء المجموعة مع فلتر الحالة `status` (`active`, `pending`, `banned`).
+- `POST /api/groups/{id}/members/{userId}/approve`: قبول طلب انضمام العضو (للمشرفين والمالك).
+- `POST /api/groups/{id}/members/{userId}/reject`: رفض طلب الانضمام (للمشرفين والمالك).
+- `PUT /api/groups/{id}/members/{userId}/role`: تغيير رتبة العضو (`member` أو `moderator`) (للمالك والإدارة).
+- `POST /api/groups/{id}/members/{userId}/kick`: طرد عضو من المجموعة (للمشرفين والمالك).
+- `POST /api/groups/{id}/members/{userId}/ban`: حظر/إلغاء حظر عضو في المجموعة (الحمولة: `{"ban": true}` أو `{"ban": false}`).
+
+#### 3. إشراف المنشورات وتثبيت الإعلانات
+- `POST /api/groups/{id}/posts/{postId}/pin`: تثبيت أو إلغاء تثبيت منشور في أعلى خلاصة المجموعة (للمشرفين والإدارة).
+
+---
+
+### ف. واجهات الخطط المدفوعة والاشتراكات لتطبيق الهاتف (Mobile Billing & Subscriptions API - v4.7.0) (`/api/billing/*`)
+
+تتيح واجهة الاشتراكات لتطبيق الهاتف (`myads_app`) والتطبيقات الخارجية المعتمدة استعراض الخطط والأسعار، فحص الكوبونات الترويجية لحظياً، التحقق من حالة الاشتراك، وبدء الفترات التجريبية المجانية.
+
+تتطلب جميع نقاط النهاية ترويسة `X-API-KEY` وترويسة توكن Sanctum `Authorization: Bearer {token}`.
+
+#### 1. استعراض الخطط والاشتراكات النشطة
+- **نقطة النهاية:** `GET /api/billing/plans`
+- **الترويسات:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`
+- **معلمات الاستعلام:**
+  - `search`: (اختياري، نص) تصفية الخطط بالاسم أو الوصف.
+- **الوصف:** تُرجع كافة خطط الاشتراك المفعلة في الموقع مهيأة لتطبيق الهاتف، بما يشمل الأسعار الأساسية وأسعار العروض الترويجية، الثواني المتبقية لنهاية الخصم، شارات التجربة المجانية، وقائمة المزايا والامتيازات المعربة.
+- **نموذج الاستجابة (`HTTP 200 OK`):**
+  ```json
+  {
+    "enabled": true,
+    "current_subscription": {
+      "id": 18,
+      "plan_id": 2,
+      "plan_name": "الخطة السنوية الاحترافية VIP",
+      "status": "active",
+      "is_trial": false,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2027-11-13T02:00:00Z",
+      "days_left": 365
+    },
+    "plans": [
+      {
+        "id": 2,
+        "name": "الخطة السنوية الاحترافية VIP",
+        "description": "أفضل خيار لأصحاب المواقع والمسوقين المحترفين",
+        "duration_days": 365,
+        "is_lifetime": false,
+        "base_price": 100.0,
+        "sale_price": 75.0,
+        "current_price": 75.0,
+        "is_on_sale": true,
+        "discount_percentage": 25,
+        "sale_ends_at": "2026-11-20T02:00:00Z",
+        "sale_seconds_remaining": 604800,
+        "has_trial": true,
+        "trial_days": 7,
+        "is_featured": true,
+        "recommended_text": "الخيار الأكثر شعبية",
+        "accent_color": "#10b981",
+        "layout_style": "glassmorphism",
+        "marketing_bullets": [
+          "أولوية قصوى في تبادل الزيارات",
+          "بدون أي إعلانات"
+        ],
+        "benefits": [
+          "تصفح بدون إعلانات نهائياً بنسبة 100% في كامل المنصة",
+          "مضاعف نقاط PTS بنسبة 2.0x عند مشاهدة الفيديوهات وتبادل الزيارات",
+          "شارة توثيق ذهبية مميزة VIP تظهر بجانب اسمك في الخلاصة والتعليقات"
+        ],
+        "is_current_plan": true,
+        "checkout_url": "https://domain.com/billing/checkout/2",
+        "trial_url": "https://domain.com/plans/2/trial"
+      }
+    ]
+  }
+  ```
+
+#### 2. الاستعلام عن تفاصيل اشتراك العضو الحالي
+- **نقطة النهاية:** `GET /api/billing/subscription`
+- **الترويسات:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`
+- **الوصف:** تُرجع حالة اشتراك العضو المسجل حالياً، وما إذا كان في فترة تجربة مجانية، وتاريخ انتهاء الصلاحية، والأيام المتبقية، وتنبيه اقتراب الانتهاء (`<= 7` أيام)، وشارة الـ VIP، والاشتراك المؤجل في طابور الانتظار (في حال شراء خطة مختلفة قبل انتهاء الحالية).
+- **نموذج الاستجابة (`HTTP 200 OK` - اشتراك نشط):**
+  ```json
+  {
+    "enabled": true,
+    "has_active_subscription": true,
+    "subscription": {
+      "id": 18,
+      "plan_id": 2,
+      "plan_name": "الخطة السنوية الاحترافية VIP",
+      "status": "active",
+      "is_trial": false,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2026-11-18T02:00:00Z",
+      "days_left": 5,
+      "is_expiring_soon": true,
+      "profile_badge": {
+        "label": "VIP PRO",
+        "color": "#10b981"
+      },
+      "entitlements": {
+        "ad_free": true,
+        "pts_multiplier": 2.0,
+        "subscription_verified_badge": true
+      }
+    },
+    "queued_subscription": null,
+    "plans_url": "https://domain.com/plans",
+    "billing_url": "https://domain.com/billing"
+  }
+  ```
+
+#### 3. التحقق اللحظي من كود الكوبون الترويجي
+- **نقطة النهاية:** `POST /api/billing/validate-coupon`
+- **الترويسات:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`, `Content-Type: application/json`
+- **الحمولة:**
+  ```json
+  {
+    "plan_id": 2,
+    "coupon_code": "SAVE20"
+  }
+  ```
+- **الوصف:** فحص صلاحية كود الخصم لحظياً وحساب قيمة الخصم المقتطعة والسعر النهائي الواجب دفعه عند إتمام الشراء.
+- **نموذج الاستجابة (`HTTP 200 OK` - كود خصم صالح):**
+  ```json
+  {
+    "valid": true,
+    "code": "SAVE20",
+    "discount_type": "percent",
+    "discount_value": 20.0,
+    "discount_amount": 15.0,
+    "final_amount": 60.0,
+    "message": "تم تطبيق كود الخصم SAVE20 بنجاح (-20%)."
+  }
+  ```
+- **نموذج الاستجابة (`HTTP 200 OK` - كود غير صالح أو منتهي):**
+  ```json
+  {
+    "valid": false,
+    "message": "كود الخصم المدخل غير صالح أو انتهت فترة استخدامه."
+  }
+  ```
+
+#### 4. بدء التجربة المجانية الفورية بضغطة زر
+- **نقطة النهاية:** `POST /api/billing/trial`
+- **الترويسات:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`, `Content-Type: application/json`
+- **الحمولة:**
+  ```json
+  {
+    "plan_id": 3
+  }
+  ```
+- **الوصف:** تفعيل فترة تجريبية مجانية فورية للخطة المحددة دون الحاجة لبطاقة ائتمان أو دفع مسبق، مع حماية آلية تمنع استفادة العضو من تجربة الخطة أكثر من مرة واحدة.
+- **نموذج الاستجابة (`HTTP 200 OK` - نجاح البدء):**
+  ```json
+  {
+    "success": true,
+    "message": "تم تفعيل الفترة التجريبية المجانية لخطة تجربة البداية (7 أيام) بنجاح!",
+    "subscription": {
+      "id": 19,
+      "plan_id": 3,
+      "plan_name": "تجربة البداية",
+      "is_trial": true,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2026-11-20T02:00:00Z"
+    }
+  }
+  ```
+- **نموذج الاستجابة (`HTTP 422 Unprocessable Content` - محاولة تكرار التجربة):**
+  ```json
+  {
+    "success": false,
+    "message": "لقد قمت بالاستفادة مسبقاً من التجربة المجانية لهذه الخطة."
+  }
+  ```
 
 ---
 
