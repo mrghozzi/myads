@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Developer Platform & REST API Ecosystem')
-            ->assertSee('Dedicated Support Forum & Solution Badges')
-            ->assertSee('Technical Support Ticketing Engine')
+            ->assertSee('Enterprise VIP Billing & Revenue Engine')
+            ->assertSee('Promo Coupons Engine & Free Trial Days')
+            ->assertSee('Zero-Trust Hardening & Turnstile Bot Defense')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('منصة المطورين وبيئة واجهات البرمجة REST API')
-            ->assertSee('منتدى الدعم الفني المخصص وشارات الحلول النموذجية')
-            ->assertSee('نظام تذاكر الدعم الفني المباشر')
+            ->assertSee('محرك الاشتراكات المميزة VIP ومنظومة الفوترة المتطورة')
+            ->assertSee('محرك قسائم التخفيض والعروض والفترات التجريبية المجانية')
+            ->assertSee('حماية انعدام الثقة (Zero-Trust) ومكافحة البوتات Turnstile')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

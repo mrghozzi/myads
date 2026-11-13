@@ -430,8 +430,8 @@
                         <div class="row g-4 justify-content-center">
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
-                                        <i class="feather-code"></i>
+                                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%); color: #f59e0b;">
+                                        <i class="feather-credit-card"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -439,8 +439,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                        <i class="feather-life-buoy"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                        <i class="feather-tag"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -448,8 +448,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-headphones"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                        <i class="feather-shield"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -457,8 +457,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                                        <i class="feather-book-open"></i>
+                                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
+                                        <i class="feather-cpu"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -466,8 +466,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                        <i class="feather-sliders"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                        <i class="feather-dollar-sign"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
@@ -476,7 +476,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
-                                        <i class="feather-shield"></i>
+                                        <i class="feather-smartphone"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_6_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_6_desc') }}</p>
