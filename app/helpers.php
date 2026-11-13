@@ -175,6 +175,24 @@ if (!function_exists('http_secure')) {
         // Production MUST verify SSL to prevent MITM attacks during update checks.
         if (app()->environment('local', 'testing')) {
             $http = $http->withoutVerifying();
+        } else {
+            // On environments without a default system CA bundle (e.g. Windows/XAMPP),
+            // auto-detect available local bundles if openssl.cafile / curl.cainfo are not set in php.ini.
+            if (!ini_get('curl.cainfo') && !ini_get('openssl.cafile')) {
+                $candidates = [
+                    'E:/xampp/apache/bin/curl-ca-bundle.crt',
+                    'C:/xampp/apache/bin/curl-ca-bundle.crt',
+                    'D:/xampp/apache/bin/curl-ca-bundle.crt',
+                    'C:/windows/system32/curl-ca-bundle.crt',
+                    'C:/windows/curl-ca-bundle.crt',
+                ];
+                foreach ($candidates as $caPath) {
+                    if (file_exists($caPath)) {
+                        $http = $http->withOptions(['verify' => $caPath]);
+                        break;
+                    }
+                }
+            }
         }
 
         return $http;
