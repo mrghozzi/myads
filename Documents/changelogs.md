@@ -20,6 +20,29 @@
 * **Automated Test Coverage (`tests/Feature/BillingEnhancedEntitlementsTest.php`)**:
   * Created a dedicated feature test suite with 5 comprehensive tests and 35 assertions verifying entitlement helpers, ad suppression, PTS multiplication during surf exchange, admin plan storage, comparison matrix rendering, and executive SaaS metrics calculation (100% pass rate).
 
+### Subscription Plan Discounts, Promo Coupons Engine, Free Trials & Extensible Themes (`/billing`, `/plans`, `/admin/billing/coupons`, `/`)
+* **Time-Limited Plan Discounts (`sale_price`, `sale_ends_at`, `SubscriptionPlan.php`)**:
+  * Added database columns `sale_price` and `sale_ends_at` to `subscription_plans` with automated expiration tracking (`is_on_sale`, `current_price`, `discount_percentage`).
+  * Interactive rendering across admin and member cards with strikethrough base prices, red discount badges (`-X% OFF`), and humanized countdown timer (`diffForHumans()`), automatically falling back to base price once expired.
+* **Promo Coupons & Discount Codes Engine (`billing_coupons`, `BillingCouponService`, `BillingCoupon.php`)**:
+  * Built an enterprise-grade promo code engine supporting both percentage (`percent`) and fixed amount (`fixed`) discounts.
+  * Supports global coupons (applicable to all plans) or plan-restricted coupons, with configurable maximum uses (`max_uses`), usage tracking (`used_count`), and expiration dates (`expires_at`).
+  * Added real-time AJAX coupon verification endpoint (`POST /plans/validate-coupon`) with live discount calculations.
+  * Added automatic zero-amount order handling (100% discount coupons) with immediate subscription activation and direct redirect to receipt/confirmation without payment gateway redirects.
+* **Free Trial Option (`trial_days`, `userCanClaimTrial`, `claimTrial`)**:
+  * Added `trial_days` configuration per plan (e.g. 7, 14, 30 days) enabling visitors and members to experience VIP benefits free of charge.
+  * Added `userCanClaimTrial($userId, $plan)` and `startFreeTrial($user, $plan)` methods preventing duplicate trial claims.
+  * 1-Click instant trial activation endpoint (`POST /plans/{plan}/trial`) activating the subscription immediately with `is_trial = true` and `trial_ends_at`.
+* **Visitor Landing / Welcome Showcase (`themes/default/views/billing/partials/landing_plans.blade.php`, `welcome.blade.php`)**:
+  * Built a sleek showcase section on the landing/welcome page (`/`) displaying active plans with sale tags, trial badges, and call-to-actions when billing is enabled.
+* **Customizable Plan Themes & Limitless Plugin Hooks**:
+  * Added `layout_style` selector (`default`, `glassmorphism`, `neon_glow`, `minimal`) to plan administration.
+  * Embedded WordPress-grade developer filter and action hooks (`billing_plans_card_class`, `billing_plans_card_badge`, `billing_plans_card_footer`, `billing_landing_plans_card_class`), allowing 3rd-party developers to easily build modular plugins with ready-made plan themes, custom animations, or widgets.
+* **Admin Coupons Management Console (`/admin/billing/coupons`, `AdminBillingController.php`)**:
+  * Designed and implemented an administrative coupon management center styled with `@.superdesign` standards, featuring search filtering, usage tracking, creation/edit form, and status toggles.
+* **Automated Test Coverage (`tests/Feature/BillingDiscountsTrialsAndCouponsTest.php`)**:
+  * Created a dedicated feature test suite with 8 comprehensive tests and 63 assertions verifying plan sale price calculations, coupon validation/redemption, zero-amount checkout, free trial activation, duplicate claim prevention, visitor landing page showcase, and admin coupon CRUD (100% pass rate).
+
 ### Double-Entry PTS Ledger Engine & Banking-Grade Mathematical Verification (`DoubleEntryLedgerService`, `pts_ledger_entries`, `myads:pts:audit`)
 * **Double-Entry PTS Ledger Architecture (`pts_ledger_entries`, `PtsLedgerEntry.php`, `database/migrations/2026_11_12_000001_create_pts_ledger_entries_table.php`)**:
   * Implemented a robust, banking-grade double-entry accounting ledger where every transaction creates equal and opposite debit and credit entries ($\sum \Delta = 0.00$) grouped by a unique `transaction_uuid`.

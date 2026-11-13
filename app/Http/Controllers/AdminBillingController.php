@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillingCoupon;
 use App\Models\BillingOrder;
 use App\Models\BillingTransaction;
 use App\Models\SubscriptionPlan;
+use App\Services\Billing\BillingCouponService;
 use App\Services\Billing\BillingCurrencyService;
 use App\Services\Billing\BillingGatewayRegistry;
 use App\Services\Billing\SubscriptionLifecycleService;
@@ -25,7 +27,8 @@ class AdminBillingController extends Controller
         private readonly BillingGatewayRegistry $gateways,
         private readonly BillingCurrencyService $currencies,
         private readonly SubscriptionPlanService $plans,
-        private readonly SubscriptionLifecycleService $lifecycle
+        private readonly SubscriptionLifecycleService $lifecycle,
+        private readonly BillingCouponService $coupons
     ) {
     }
 
@@ -205,6 +208,136 @@ class AdminBillingController extends Controller
 
         return redirect()->route('admin.billing.plans')
             ->with('success', __('messages.billing_plan_saved'));
+    }
+
+    public function coupons(Request $request)
+    {
+        $featureAvailable = $this->schema->supports('subscriptions_billing');
+        $upgradeNotice = $this->schema->notice('subscriptions_billing', __('messages.billing_coupons_title'));
+        $search = trim((string) $request->query('search', ''));
+        $coupons = $this->emptyPaginator();
+        $plans = collect();
+        $editingCoupon = null;
+
+        if ($featureAvailable) {
+            try {
+                $coupons = $this->coupons->paginateForAdmin($search);
+                $plans = SubscriptionPlan::query()->orderBy('sort_order')->get();
+                if ($request->filled('edit')) {
+                    $editingCoupon = BillingCoupon::find($request->integer('edit'));
+                }
+            } catch (\Throwable) {
+                $coupons = $this->emptyPaginator();
+            }
+        }
+
+        return view('admin::admin.billing.coupons', [
+            'featureAvailable' => $featureAvailable,
+            'upgradeNotice' => $upgradeNotice,
+            'coupons' => $coupons,
+            'plans' => $plans,
+            'search' => $search,
+            'editingCoupon' => $editingCoupon,
+        ]);
+    }
+
+    public function storeCoupon(Request $request): RedirectResponse|JsonResponse
+    {
+        if (!$this->schema->supports('subscriptions_billing')) {
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_coupons_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.coupons')->with('error', $msg);
+        }
+
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:billing_coupons,code',
+            'description' => 'nullable|string|max:255',
+            'discount_type' => 'required|in:percent,fixed',
+            'discount_value' => 'required|numeric|min:0.01',
+            'subscription_plan_id' => 'nullable|integer|exists:subscription_plans,id',
+            'max_uses' => 'nullable|integer|min:1',
+            'expires_at' => 'nullable|date',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $coupon = $this->coupons->store($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_coupon_saved'),
+                'coupon' => $coupon,
+            ]);
+        }
+
+        return redirect()->route('admin.billing.coupons')
+            ->with('success', __('messages.billing_coupon_saved'));
+    }
+
+    public function updateCoupon(Request $request, int $coupon): RedirectResponse|JsonResponse
+    {
+        if (!$this->schema->supports('subscriptions_billing')) {
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_coupons_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.coupons')->with('error', $msg);
+        }
+
+        $couponModel = BillingCoupon::find($coupon);
+        abort_if(!$couponModel, 404);
+
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:billing_coupons,code,' . $couponModel->id,
+            'description' => 'nullable|string|max:255',
+            'discount_type' => 'required|in:percent,fixed',
+            'discount_value' => 'required|numeric|min:0.01',
+            'subscription_plan_id' => 'nullable|integer|exists:subscription_plans,id',
+            'max_uses' => 'nullable|integer|min:1',
+            'expires_at' => 'nullable|date',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $this->coupons->update($couponModel, $validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_coupon_saved'),
+                'coupon' => $couponModel->fresh(),
+            ]);
+        }
+
+        return redirect()->route('admin.billing.coupons')
+            ->with('success', __('messages.billing_coupon_saved'));
+    }
+
+    public function deleteCoupon(Request $request, int $coupon): RedirectResponse|JsonResponse
+    {
+        if (!$this->schema->supports('subscriptions_billing')) {
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_coupons_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.coupons')->with('error', $msg);
+        }
+
+        $couponModel = BillingCoupon::find($coupon);
+        abort_if(!$couponModel, 404);
+
+        $this->coupons->delete($couponModel);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_coupon_deleted'),
+            ]);
+        }
+
+        return redirect()->route('admin.billing.coupons')
+            ->with('success', __('messages.billing_coupon_deleted'));
     }
 
     public function orders(Request $request)
@@ -561,6 +694,10 @@ class AdminBillingController extends Controller
             'duration_days' => 'nullable|integer|min:1|max:3650',
             'is_lifetime' => 'nullable|boolean',
             'base_price' => 'required|numeric|min:0|max:999999',
+            'sale_price' => 'nullable|numeric|min:0|max:999999',
+            'sale_ends_at' => 'nullable|date',
+            'trial_days' => 'nullable|integer|min:0|max:365',
+            'layout_style' => 'nullable|string|max:50',
             'is_featured' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
             'sort_order' => 'nullable|integer|min:0|max:999999',

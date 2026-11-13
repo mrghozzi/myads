@@ -127,6 +127,7 @@ class BillingController extends Controller
             'gateway' => 'required|string|in:' . implode(',', $enabledGatewayKeys),
             'currency_code' => 'required|string|max:10',
             'phone_number' => 'required_if:gateway,tabby|nullable|string|max:30',
+            'coupon_code' => 'nullable|string|max:50',
         ]);
 
         $planModel = $this->plans->find($plan, true);
@@ -145,11 +146,31 @@ class BillingController extends Controller
         }
 
         try {
-            $order = $this->lifecycle->createOrder(auth()->user(), $planModel, (string) $validated['gateway'], (string) $currency->code);
+            $order = $this->lifecycle->createOrder(
+                auth()->user(),
+                $planModel,
+                (string) $validated['gateway'],
+                (string) $currency->code,
+                $validated['coupon_code'] ?? null
+            );
+
             if ($validated['gateway'] === 'tabby') {
                 $order->meta = array_merge((array) $order->meta, ['phone_number' => $validated['phone_number']]);
                 $order->save();
             }
+
+            // Zero-amount orders (100% discount coupons)
+            if ((float) $order->display_amount <= 0) {
+                $this->lifecycle->completePaidOrder($order, [
+                    'external_transaction_id' => 'COUPON_FREE_' . $order->order_number,
+                    'amount' => 0,
+                    'currency_code' => $order->currency_code,
+                ], 'coupon_zero_payment');
+
+                return redirect()->route('billing.orders.receipt.show', $order->id)
+                    ->with('success', __('messages.billing_payment_success'));
+            }
+
             $checkoutPayload = $gateway->createCheckout($order);
             $order = $this->lifecycle->attachGatewayCheckout($order, $checkoutPayload);
         } catch (ValidationException $exception) {
@@ -449,5 +470,53 @@ class BillingController extends Controller
                 'order' => $orderModel->id,
             ]),
         ]);
+    }
+
+    public function validateCoupon(Request $request)
+    {
+        if (!$this->schema->supports('subscriptions_billing') || !SubscriptionSettings::isEnabled()) {
+            return response()->json(['valid' => false, 'message' => __('messages.billing_system_disabled_notice')], 403);
+        }
+
+        $code = trim((string) ($request->input('coupon_code') ?: $request->input('code')));
+        $planId = (int) $request->input('plan_id');
+
+        if ($code === '') {
+            return response()->json(['valid' => false, 'message' => __('messages.billing_coupon_empty')], 422);
+        }
+
+        $planModel = $this->plans->find($planId, true);
+        if (!$planModel) {
+            return response()->json(['valid' => false, 'message' => __('messages.no_data')], 404);
+        }
+
+        $couponService = app(\App\Services\Billing\BillingCouponService::class);
+        $result = $couponService->validate($code, $planModel, auth()->user());
+
+        return response()->json($result);
+    }
+
+    public function claimTrial(Request $request, int $plan)
+    {
+        if (!$this->schema->supports('subscriptions_billing') || !SubscriptionSettings::isEnabled()) {
+            return redirect()->route('billing.dashboard')
+                ->with('error', __('messages.billing_system_disabled_notice'));
+        }
+
+        $planModel = $this->plans->find($plan, true);
+        abort_if(!$planModel || !$planModel->has_trial, 404);
+
+        try {
+            $subscription = $this->lifecycle->startFreeTrial(auth()->user(), $planModel);
+
+            return redirect()->route('billing.dashboard')
+                ->with('success', __('messages.billing_trial_started_success', [
+                    'plan' => $planModel->name,
+                    'days' => $planModel->trial_days,
+                ]));
+        } catch (\DomainException $e) {
+            return redirect()->route('billing.plans')
+                ->with('error', $e->getMessage());
+        }
     }
 }

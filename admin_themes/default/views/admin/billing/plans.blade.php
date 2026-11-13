@@ -103,8 +103,21 @@
                                                 {{ $plan->is_lifetime ? __('messages.billing_lifetime') : __('messages.billing_duration_days_value', ['days' => $plan->duration_days]) }}
                                             </td>
                                             <td class="fw-bold text-dark fs-14">
-                                                {{ number_format((float) $plan->base_price, 2) }}
+                                                @if($plan->is_on_sale)
+                                                    <span class="text-decoration-line-through text-muted fs-12 d-block">{{ number_format((float) $plan->base_price, 2) }}</span>
+                                                    <span class="text-danger fw-bold">{{ number_format((float) $plan->sale_price, 2) }}</span>
+                                                    <span class="badge bg-soft-danger text-danger border border-danger border-opacity-25 rounded-pill px-1 ms-1 fs-10">-{{ $plan->discount_percentage }}%</span>
+                                                @else
+                                                    {{ number_format((float) $plan->base_price, 2) }}
+                                                @endif
                                                 <small class="text-muted fw-normal fs-11 ms-1">{{ $settings['base_currency_code'] ?? 'USD' }}</small>
+                                                @if($plan->has_trial)
+                                                    <div class="mt-1">
+                                                        <span class="badge bg-soft-info text-info border border-info border-opacity-25 rounded-pill px-2 py-0 fs-10">
+                                                            <i class="feather-clock me-1"></i>{{ $plan->trial_days }} {{ __('messages.days') }} {{ __('messages.billing_trial_free_tag') }}
+                                                        </span>
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex flex-column align-items-start gap-1">
@@ -202,6 +215,51 @@
                                         <input type="number" min="1" name="duration_days" class="form-control" value="{{ old('duration_days', $editingPlan->duration_days ?? 30) }}" style="border-radius: 10px 0 0 10px;">
                                         <span class="input-group-text bg-white text-muted" style="border-radius: 0 10px 10px 0;">{{ __('messages.days') }}</span>
                                     </div>
+                                </div>
+
+                                {{-- Time-limited Discount & Free Trial Options --}}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
+                                        {{ __('messages.billing_sale_price_label') }}
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0" name="sale_price" class="form-control" value="{{ old('sale_price', $editingPlan->sale_price ?? '') }}" placeholder="{{ __('messages.billing_sale_price_placeholder') }}" style="border-radius: 10px 0 0 10px;">
+                                        <span class="input-group-text bg-white fw-bold text-muted" style="border-radius: 0 10px 10px 0;">{{ $settings['base_currency_code'] ?? 'USD' }}</span>
+                                    </div>
+                                    <small class="text-muted fs-11">{{ __('messages.billing_sale_price_help') }}</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
+                                        {{ __('messages.billing_sale_ends_at_label') }}
+                                    </label>
+                                    <input type="datetime-local" name="sale_ends_at" class="form-control" value="{{ old('sale_ends_at', $editingPlan?->sale_ends_at ? $editingPlan->sale_ends_at->format('Y-m-d\TH:i') : '') }}" style="border-radius: 10px;">
+                                    <small class="text-muted fs-11">{{ __('messages.billing_sale_ends_at_help') }}</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
+                                        {{ __('messages.billing_trial_days_label') }}
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" min="0" max="365" name="trial_days" class="form-control" value="{{ old('trial_days', $editingPlan->trial_days ?? 0) }}" placeholder="0" style="border-radius: 10px 0 0 10px;">
+                                        <span class="input-group-text bg-white text-muted" style="border-radius: 0 10px 10px 0;">{{ __('messages.days') }}</span>
+                                    </div>
+                                    <small class="text-muted fs-11">{{ __('messages.billing_trial_days_help') }}</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
+                                        {{ __('messages.billing_layout_style_label') }}
+                                    </label>
+                                    <select name="layout_style" class="form-select" style="border-radius: 10px;">
+                                        @php($currentLayout = old('layout_style', $editingPlan->layout_style ?? 'default'))
+                                        <option value="default" @selected($currentLayout === 'default')>{{ __('messages.billing_layout_default') }}</option>
+                                        <option value="glassmorphism" @selected($currentLayout === 'glassmorphism')>{{ __('messages.billing_layout_glassmorphism') }}</option>
+                                        <option value="neon_glow" @selected($currentLayout === 'neon_glow')>{{ __('messages.billing_layout_neon_glow') }}</option>
+                                        <option value="minimal" @selected($currentLayout === 'minimal')>{{ __('messages.billing_layout_minimal') }}</option>
+                                    </select>
+                                    <small class="text-muted fs-11">{{ __('messages.billing_layout_style_help') }}</small>
                                 </div>
 
                                 <div class="col-md-6">

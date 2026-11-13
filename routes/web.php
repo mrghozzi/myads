@@ -292,6 +292,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/live/stream', [\App\Http\Controllers\LiveStreamController::class, 'stream'])->name('live.stream');
     Route::get('/settings/billing', [BillingController::class, 'dashboard'])->name('billing.dashboard');
     Route::get('/billing', [BillingController::class, 'dashboard'])->name('billing.index');
+    Route::post('/plans/validate-coupon', [BillingController::class, 'validateCoupon'])->name('billing.coupon.validate');
+    Route::post('/plans/{plan}/trial', [BillingController::class, 'claimTrial'])->name('billing.trial.claim');
     Route::post('/plans/{plan}/purchase', [BillingController::class, 'purchase'])->name('billing.purchase');
     Route::get('/billing/orders/{order}', [BillingController::class, 'showOrder'])->name('billing.orders.show');
     Route::get('/billing/orders/{order}/receipt', [BillingController::class, 'showReceipt'])->name('billing.orders.receipt.show');
@@ -1003,6 +1005,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/currencies/{currency}/base', [AdminBillingController::class, 'setBaseCurrency'])->name('admin.billing.currencies.base');
         Route::get('/gateways', [AdminBillingController::class, 'gateways'])->name('admin.billing.gateways');
         Route::post('/gateways/{gateway}', [AdminBillingController::class, 'updateGateway'])->name('admin.billing.gateways.update');
+        Route::get('/coupons', [AdminBillingController::class, 'coupons'])->name('admin.billing.coupons');
+        Route::post('/coupons', [AdminBillingController::class, 'storeCoupon'])->name('admin.billing.coupons.store');
+        Route::post('/coupons/{coupon}', [AdminBillingController::class, 'updateCoupon'])->name('admin.billing.coupons.update');
+        Route::delete('/coupons/{coupon}', [AdminBillingController::class, 'deleteCoupon'])->name('admin.billing.coupons.delete');
     });
 
     Route::prefix('orders')->group(function () {

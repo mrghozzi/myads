@@ -724,6 +724,10 @@
         </div>
     </section>
 
+    @if(\App\Support\SubscriptionSettings::isEnabled())
+        @include('theme::billing.partials.landing_plans')
+    @endif
+
     <!-- Footer -->
     <div style="max-width: 1200px; margin: 0 auto 40px auto; padding: 0 24px; z-index: 10; position: relative;">
         @include('theme::partials.ads', ['id' => 6])

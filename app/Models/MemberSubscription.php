@@ -23,11 +23,13 @@ class MemberSubscription extends Model
         'billing_order_id',
         'queued_from_subscription_id',
         'status',
+        'is_trial',
         'plan_name',
         'plan_snapshot',
         'entitlements_snapshot',
         'starts_at',
         'ends_at',
+        'trial_ends_at',
         'activated_at',
         'benefits_applied_at',
         'completed_at',
@@ -35,10 +37,12 @@ class MemberSubscription extends Model
     ];
 
     protected $casts = [
+        'is_trial' => 'boolean',
         'plan_snapshot' => 'array',
         'entitlements_snapshot' => 'array',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
+        'trial_ends_at' => 'datetime',
         'activated_at' => 'datetime',
         'benefits_applied_at' => 'datetime',
         'completed_at' => 'datetime',

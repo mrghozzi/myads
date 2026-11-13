@@ -24,12 +24,16 @@ class BillingOrder extends Model
         'order_number',
         'user_id',
         'subscription_plan_id',
+        'billing_coupon_id',
+        'coupon_code',
         'member_subscription_id',
         'gateway',
         'status',
+        'is_trial',
         'base_currency_code',
         'currency_code',
         'base_amount',
+        'discount_amount',
         'display_amount',
         'exchange_rate_snapshot',
         'gateway_checkout_reference',
@@ -47,7 +51,9 @@ class BillingOrder extends Model
 
     protected $casts = [
         'base_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'display_amount' => 'decimal:2',
+        'is_trial' => 'boolean',
         'exchange_rate_snapshot' => 'decimal:6',
         'paid_at' => 'datetime',
         'approved_at' => 'datetime',
@@ -65,6 +71,11 @@ class BillingOrder extends Model
     public function plan()
     {
         return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(BillingCoupon::class, 'billing_coupon_id');
     }
 
     public function subscription()
@@ -109,5 +120,10 @@ class BillingOrder extends Model
         return filled($this->receipt_path)
             ? route('billing.orders.receipt.show', $this->id)
             : null;
+    }
+
+    public function getFinalAmountAttribute(): float
+    {
+        return (float) $this->base_amount;
     }
 }

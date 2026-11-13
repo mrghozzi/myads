@@ -24,25 +24,48 @@ class SubscriptionLifecycleService
     ) {
     }
 
-    public function createOrder(User $user, SubscriptionPlan $plan, string $gatewayKey, string $currencyCode): BillingOrder
+    public function createOrder(User $user, SubscriptionPlan $plan, string $gatewayKey, string $currencyCode, ?string $couponCode = null): BillingOrder
     {
         $gateway = $this->gateways->get($gatewayKey);
-        $conversion = $this->currencies->convertFromBase((float) $plan->base_price, $currencyCode);
+
+        $baseAmount = (float) $plan->current_price;
+        $discountAmount = 0.0;
+        $coupon = null;
+
+        if ($couponCode !== null && trim($couponCode) !== '') {
+            $couponResult = app(BillingCouponService::class)->validate($couponCode, $plan, $user);
+            if (!empty($couponResult['valid'])) {
+                $coupon = $couponResult['coupon'];
+                $discountAmount = (float) $couponResult['discount_amount'];
+                $finalBaseAmount = (float) $couponResult['final_amount'];
+            } else {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'coupon_code' => $couponResult['message'] ?? __('messages.billing_coupon_error'),
+                ]);
+            }
+        } else {
+            $finalBaseAmount = $baseAmount;
+        }
+
+        $conversion = $this->currencies->convertFromBase($finalBaseAmount, $currencyCode);
         $currency = $conversion['currency'];
         $planSnapshot = $this->plans->planSnapshot($plan);
 
-        return DB::transaction(function () use ($user, $plan, $gateway, $conversion, $currency, $planSnapshot): BillingOrder {
+        return DB::transaction(function () use ($user, $plan, $gateway, $conversion, $currency, $planSnapshot, $finalBaseAmount, $discountAmount, $coupon): BillingOrder {
             $order = BillingOrder::query()->create([
                 'order_number' => $this->generateOrderNumber(),
                 'user_id' => (int) $user->id,
                 'subscription_plan_id' => (int) $plan->id,
+                'billing_coupon_id' => $coupon?->id,
+                'coupon_code' => $coupon?->code,
                 'gateway' => $gateway->key(),
                 'status' => $gateway->key() === 'bank_transfer'
                     ? BillingOrder::STATUS_PENDING_RECEIPT
                     : BillingOrder::STATUS_PENDING_CHECKOUT,
                 'base_currency_code' => $this->currencies->baseCurrency()->code,
                 'currency_code' => (string) $currency->code,
-                'base_amount' => (float) $plan->base_price,
+                'base_amount' => $finalBaseAmount,
+                'discount_amount' => $discountAmount,
                 'display_amount' => (float) $conversion['display_amount'],
                 'exchange_rate_snapshot' => (float) $conversion['exchange_rate'],
                 'expires_at' => now()->addHours(24),
@@ -52,6 +75,8 @@ class SubscriptionLifecycleService
                     'currency_name' => $currency->name,
                     'currency_decimal_places' => (int) $currency->decimal_places,
                     'gateway_label' => $gateway->label(),
+                    'coupon_code' => $coupon?->code,
+                    'coupon_discount' => $discountAmount,
                 ],
             ]);
 
@@ -65,10 +90,63 @@ class SubscriptionLifecycleService
                 'processed_at' => now(),
                 'meta' => [
                     'order_number' => $order->order_number,
+                    'coupon_code' => $coupon?->code,
                 ],
             ]);
 
             return $order;
+        });
+    }
+
+    public function userCanClaimTrial(User|int $user, SubscriptionPlan $plan): bool
+    {
+        if (!$plan->has_trial) {
+            return false;
+        }
+
+        $userId = $user instanceof User ? (int) $user->id : (int) $user;
+
+        return !MemberSubscription::query()
+            ->where('user_id', $userId)
+            ->where('subscription_plan_id', $plan->id)
+            ->where('is_trial', true)
+            ->exists();
+    }
+
+    public function startFreeTrial(User $user, SubscriptionPlan $plan): MemberSubscription
+    {
+        if (!$this->userCanClaimTrial($user, $plan)) {
+            throw new \DomainException(__('messages.billing_trial_already_claimed'));
+        }
+
+        $planSnapshot = $this->plans->planSnapshot($plan);
+        $trialDays = (int) $plan->trial_days;
+        $startsAt = now();
+        $endsAt = now()->addDays($trialDays);
+
+        return DB::transaction(function () use ($user, $plan, $planSnapshot, $trialDays, $startsAt, $endsAt): MemberSubscription {
+            $subscription = MemberSubscription::query()->create([
+                'user_id' => (int) $user->id,
+                'subscription_plan_id' => (int) $plan->id,
+                'status' => MemberSubscription::STATUS_ACTIVE,
+                'is_trial' => true,
+                'plan_name' => (string) $plan->name,
+                'plan_snapshot' => $planSnapshot,
+                'entitlements_snapshot' => (array) ($planSnapshot['entitlements'] ?? []),
+                'starts_at' => $startsAt,
+                'ends_at' => $endsAt,
+                'trial_ends_at' => $endsAt,
+                'activated_at' => $startsAt,
+                'benefits_applied_at' => null,
+                'meta' => [
+                    'trial_days' => $trialDays,
+                    'is_free_trial' => true,
+                ],
+            ]);
+
+            $this->entitlements->applyActivationBenefits($user, $subscription);
+
+            return $subscription;
         });
     }
 
@@ -163,7 +241,7 @@ class SubscriptionLifecycleService
         });
     }
 
-    public function completePaidOrder(BillingOrder|int $order, array $payload, string $transactionType = 'gateway_capture'): BillingOrder
+    public function completePaidOrder(BillingOrder|int $order, array $payload = [], string $transactionType = 'gateway_capture'): BillingOrder
     {
         if (!$this->schema->supports('subscriptions_billing')) {
             return $order instanceof BillingOrder ? $order : new BillingOrder();
@@ -184,6 +262,10 @@ class SubscriptionLifecycleService
             $model->gateway_checkout_reference = (string) ($payload['gateway_checkout_reference'] ?? $model->gateway_checkout_reference ?? '');
             $model->meta = array_merge((array) $model->meta, (array) ($payload['meta'] ?? []));
             $model->save();
+
+            if ($model->billing_coupon_id && !$alreadyPaid) {
+                \App\Models\BillingCoupon::where('id', $model->billing_coupon_id)->increment('used_count');
+            }
 
             $this->logTransaction($model, [
                 'gateway' => $model->gateway,

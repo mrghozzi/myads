@@ -102,6 +102,7 @@ custom_variables.css
 !/tests/Feature/GroupApiTest.php
 !/tests/Feature/V430GroupsTranslationsFeatureTest.php
 !/tests/Feature/BillingEnhancedEntitlementsTest.php
+!/tests/Feature/BillingDiscountsTrialsAndCouponsTest.php
 !/tests/Feature/Themes/
 !/tests/Feature/Themes/*
 ~/.pi/

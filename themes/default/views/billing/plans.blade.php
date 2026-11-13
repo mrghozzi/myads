@@ -59,8 +59,19 @@
         @forelse($plans as $plan)
             @php
                 $benefits = $entitlementService->memberBenefitLines((array) ($plan->entitlements ?? []));
+                $layoutStyle = $plan->layout_style ?? 'default';
+                $customCardStyle = '';
+                if ($layoutStyle === 'glassmorphism') {
+                    $customCardStyle = 'background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);';
+                } elseif ($layoutStyle === 'neon_glow') {
+                    $accent = $plan->accent_color ?: '#615dfa';
+                    $customCardStyle = "box-shadow: 0 0 25px {$accent}40; border: 2px solid {$accent};";
+                } elseif ($layoutStyle === 'minimal') {
+                    $customCardStyle = 'box-shadow: none; border: 1px solid var(--border-color, #e2e8f0);';
+                }
+                $cardClass = function_exists('apply_filters') ? apply_filters('billing_plans_card_class', 'widget-box', $plan) : 'widget-box';
             @endphp
-            <div class="widget-box" style="overflow: hidden; border-top: 4px solid {{ $plan->accent_color ?: '#615dfa' }};">
+            <div class="{{ $cardClass }}" style="overflow: hidden; border-top: 4px solid {{ $plan->accent_color ?: '#615dfa' }}; {{ $customCardStyle }}">
                 <div class="widget-box-content" style="padding: 28px;">
                     <div style="display: flex; justify-content: space-between; gap: 10px; align-items: flex-start;">
                         <div>
@@ -72,17 +83,59 @@
                             <p class="widget-box-title" style="margin-bottom: 6px;">{{ $plan->name }}</p>
                             <p class="user-status-text">{{ $plan->description }}</p>
                         </div>
-                        @if($plan->is_featured)
-                            <span style="display: inline-flex; padding: 6px 12px; border-radius: 999px; background: #eef6ff; color: #2563eb; font-size: 12px; font-weight: 700;">
-                                {{ __('messages.billing_featured_plan') }}
-                            </span>
-                        @endif
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            @if($plan->is_featured)
+                                <span style="display: inline-flex; padding: 6px 12px; border-radius: 999px; background: #eef6ff; color: #2563eb; font-size: 12px; font-weight: 700;">
+                                    {{ __('messages.billing_featured_plan') }}
+                                </span>
+                            @endif
+                            @if(function_exists('do_action'))
+                                @php(do_action('billing_plans_card_badge', $plan))
+                            @endif
+                        </div>
                     </div>
 
                     <div style="margin: 22px 0;">
-                        <div style="font-size: 34px; font-weight: 800; color: var(--heading-color);">{{ number_format((float) $plan->base_price, 2) }}</div>
+                        @if($plan->is_on_sale)
+                            <div style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+                                <span style="font-size: 20px; text-decoration: line-through; color: #94a3b8;">{{ number_format((float) $plan->base_price, 2) }}</span>
+                                <span style="font-size: 34px; font-weight: 800; color: #ef4444;">{{ number_format((float) $plan->sale_price, 2) }}</span>
+                                <span style="padding: 3px 8px; border-radius: 999px; background: rgba(239, 68, 68, 0.12); color: #ef4444; font-size: 11px; font-weight: 800;">
+                                    -{{ $plan->discount_percentage }}% {{ __('messages.billing_sale_tag') }}
+                                </span>
+                            </div>
+                            @if($plan->sale_ends_at)
+                                <small style="color: #ef4444; font-size: 11px; display: block; margin-top: 4px;">
+                                    <i class="fa fa-clock me-1"></i>{{ __('messages.billing_sale_ends_in') }}: {{ $plan->sale_ends_at->diffForHumans() }}
+                                </small>
+                            @endif
+                        @else
+                            <div style="font-size: 34px; font-weight: 800; color: var(--heading-color);">{{ number_format((float) $plan->base_price, 2) }}</div>
+                        @endif
                         <div class="user-status-text">{{ $baseCurrencyCode }} · {{ $plan->is_lifetime ? __('messages.billing_lifetime') : __('messages.billing_duration_days_value', ['days' => $plan->duration_days]) }}</div>
                     </div>
+
+                    {{-- Free Trial Banner / CTA --}}
+                    @if($plan->has_trial)
+                        <div style="margin-bottom: 18px; padding: 12px 14px; background: rgba(16, 185, 129, 0.08); border: 1px dashed #10b981; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                            <div>
+                                <span style="color: #10b981; font-weight: 700; font-size: 13px;">
+                                    <i class="fa fa-gift me-1"></i> {{ $plan->trial_days }} {{ __('messages.days') }} {{ __('messages.billing_trial_free_tag') }}
+                                </span>
+                                <p style="font-size: 11px; margin: 2px 0 0 0; color: var(--text-color-light);">{{ __('messages.billing_trial_free_help') }}</p>
+                            </div>
+                            @auth
+                                @if(app(\App\Services\Billing\SubscriptionLifecycleService::class)->userCanClaimTrial(auth()->id(), $plan))
+                                    <form action="{{ route('billing.trial.claim', $plan->id) }}" method="POST" style="margin: 0;">
+                                        @csrf
+                                        <button type="submit" class="button primary" style="padding: 6px 14px; font-size: 12px; white-space: nowrap; background: #10b981; border-color: #10b981;">
+                                            {{ __('messages.billing_start_free_trial') }}
+                                        </button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
+                    @endif
 
                     @if(!empty($plan->marketing_bullets))
                         <div style="margin-bottom: 20px;">
@@ -128,6 +181,19 @@
                                         @endforeach
                                     </select>
                                 </div>
+
+                                {{-- Promo / Coupon Code Input --}}
+                                <div style="margin-top: 4px;">
+                                    <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">{{ __('messages.billing_coupon_code') }}</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="text" name="coupon_code" class="form-input billing-coupon-input" placeholder="{{ __('messages.billing_coupon_placeholder') }}" style="text-transform: uppercase; font-family: monospace;">
+                                        <button type="button" class="button secondary btn-apply-coupon" data-plan-id="{{ $plan->id }}" style="padding: 0 14px; white-space: nowrap; font-size: 12px;">
+                                            {{ __('messages.apply') }}
+                                        </button>
+                                    </div>
+                                    <div class="coupon-feedback-message" style="font-size: 11px; margin-top: 4px; display: none; font-weight: 600;"></div>
+                                </div>
+
                                 <div class="tabby-phone-container" style="display: none;">
                                     <label class="form-label">{{ __('messages.billing_phone_number') }} <span style="color: red;">*</span></label>
                                     <input type="text" name="phone_number" class="form-input billing-phone-input" placeholder="+966500000000" value="{{ old('phone_number') }}">
@@ -144,6 +210,10 @@
                             <a href="{{ route('register') }}" class="button secondary">{{ __('messages.register') }}</a>
                         </div>
                     @endauth
+
+                    @if(function_exists('do_action'))
+                        @php(do_action('billing_plans_card_footer', $plan))
+                    @endif
                 </div>
             </div>
         @empty
@@ -394,6 +464,66 @@
             });
             syncCurrencies();
             toggleTabbyPhone();
+        });
+
+        document.querySelectorAll('.btn-apply-coupon').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const planId = this.dataset.planId;
+                const form = this.closest('form');
+                const input = form.querySelector('.billing-coupon-input');
+                const feedback = form.querySelector('.coupon-feedback-message');
+                const code = input ? input.value.trim() : '';
+
+                if (!code) {
+                    if (feedback) {
+                        feedback.style.display = 'block';
+                        feedback.style.color = '#ef4444';
+                        feedback.textContent = '{{ __("messages.billing_coupon_empty") }}';
+                    }
+                    return;
+                }
+
+                button.disabled = true;
+                const originalText = button.textContent;
+                button.textContent = '...';
+
+                fetch('{{ route("billing.coupon.validate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        plan_id: planId,
+                        coupon_code: code
+                    })
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    if (feedback) {
+                        feedback.style.display = 'block';
+                        if (data.valid) {
+                            feedback.style.color = '#10b981';
+                            feedback.textContent = data.message + ' ({{ __("messages.billing_final_amount") }}: ' + data.final_amount + ')';
+                        } else {
+                            feedback.style.color = '#ef4444';
+                            feedback.textContent = data.message;
+                        }
+                    }
+                })
+                .catch(function () {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                    if (feedback) {
+                        feedback.style.display = 'block';
+                        feedback.style.color = '#ef4444';
+                        feedback.textContent = '{{ __("messages.billing_coupon_error") }}';
+                    }
+                });
+            });
         });
     });
 </script>

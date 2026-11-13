@@ -10,6 +10,11 @@
             'label' => __('messages.billing_plans_tab'),
             'icon' => 'feather-layers',
         ],
+        'coupons' => [
+            'route' => 'admin.billing.coupons',
+            'label' => __('messages.billing_coupons_tab'),
+            'icon' => 'feather-tag',
+        ],
         'orders' => [
             'route' => 'admin.billing.orders',
             'label' => __('messages.billing_orders_tab'),
