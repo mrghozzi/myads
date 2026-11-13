@@ -103,6 +103,8 @@ custom_variables.css
 !/tests/Feature/V430GroupsTranslationsFeatureTest.php
 !/tests/Feature/BillingEnhancedEntitlementsTest.php
 !/tests/Feature/BillingDiscountsTrialsAndCouponsTest.php
+!/tests/Feature/MobileBillingApiTest.php
+!/tests/Feature/Themes/BootstrapSampleBillingTest.php
 !/tests/Feature/Themes/
 !/tests/Feature/Themes/*
 ~/.pi/

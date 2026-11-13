@@ -200,6 +200,12 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Ads Stats API
     Route::get('/ads/stats', [App\Http\Controllers\Api\AdsStatsApiController::class, 'stats']);
+
+    // Billing & Subscriptions API
+    Route::get('/billing/plans', [App\Http\Controllers\Api\BillingApiController::class, 'plans']);
+    Route::get('/billing/subscription', [App\Http\Controllers\Api\BillingApiController::class, 'subscription']);
+    Route::post('/billing/validate-coupon', [App\Http\Controllers\Api\BillingApiController::class, 'validateCoupon']);
+    Route::post('/billing/trial', [App\Http\Controllers\Api\BillingApiController::class, 'claimTrial']);
 });
 
 // Developer Platform API v1

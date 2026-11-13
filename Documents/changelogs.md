@@ -43,6 +43,32 @@
 * **Automated Test Coverage (`tests/Feature/BillingDiscountsTrialsAndCouponsTest.php`)**:
   * Created a dedicated feature test suite with 8 comprehensive tests and 63 assertions verifying plan sale price calculations, coupon validation/redemption, zero-amount checkout, free trial activation, duplicate claim prevention, visitor landing page showcase, and admin coupon CRUD (100% pass rate).
 
+### Mobile App & Alternate Themes Billing Compatibility (`myads_app`, `themes/bootstrap-sample`, `AuthenticateMobileWebViewToken`, `BillingApiController`)
+* **Mobile WebView Token Bridge (`AuthenticateMobileWebViewToken.php`, `bootstrap/app.php`)**:
+  * Implemented an intelligent middleware in the `web` pipeline prepended before authentication (`\Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class`).
+  * Automatically resolves Sanctum Bearer tokens from `Authorization: Bearer <token>` or `?auth_token=` in WebView requests (`/billing`, `/plans`, `/support`), transparently logging mobile users into the Laravel web session (`Auth::guard('web')->login($user)`).
+  * Eliminates guest redirects to `/login`, giving mobile app users a seamless, friction-free embedded billing experience.
+* **Native Mobile Billing REST API (`routes/api.php`, `BillingApiController.php`)**:
+  * Added 4 dedicated mobile API endpoints under `Route::middleware(['api.key', 'auth:sanctum'])`:
+    * `GET /api/billing/plans`: Returns active subscription plans with sale prices, time-limited countdown seconds, trial information, and marketing benefit lines formatted for mobile.
+    * `GET /api/billing/subscription`: Returns the authenticated member's active plan, trial status, expiration date, days left, expiring soon indicator, and queued subscription.
+    * `POST /api/billing/validate-coupon`: Validates promo codes in real time from mobile with discount calculations and localized messaging.
+    * `POST /api/billing/trial`: Claims a free trial directly from the mobile app with automated duplicate claim prevention.
+* **Mobile App VIP Entitlements & Badge Sync (`myads_app`, `user_model.dart`, `post_card.dart`, `UserResource.php`)**:
+  * Added `subscription_badge` to `app/Http/Resources/UserResource.php`, automatically streaming active VIP subscription badges across all API responses (statuses, comments, user profiles, current user).
+  * Updated Flutter `UserModel` with `SubscriptionBadgeModel` and automated JSON deserialization.
+  * Enhanced `PostCard` in `myads_app` to render a styled, branded subscription badge pill alongside verified badges for post authors and quoted reposts.
+  * Verified 100% Flutter compatibility: `flutter analyze` reports 0 issues, and all 11 unit/widget tests pass.
+* **Bootstrap-Sample Theme Full Parity (`themes/bootstrap-sample/views/billing/*`, `welcome.blade.php`)**:
+  * Ported and styled all latest billing features to the `bootstrap-sample` theme:
+    * `partials/landing_plans.blade.php`: Sleek showcase section integrated into `welcome.blade.php` with sale countdown badges and trial indicators.
+    * `plans.blade.php`: Upgraded with time-limited discounts, free trial claims, live AJAX coupon validation, responsive 8-row Feature Comparison Matrix, theme layout styles, and developer hooks (`billing_plans_card_class`, `billing_plans_card_badge`).
+    * `dashboard.blade.php`: Upgraded with 7-day expiration warning banner, 1-click renewal CTA, and trial status badge.
+    * `order.blade.php`: Upgraded with `@media print` styling, 1-click "Print Invoice" button (`window.print()`), coupon discount line items, and official Tax Invoice `#INV-...` card.
+* **Automated Test Coverage (`tests/Feature/MobileBillingApiTest.php`, `tests/Feature/Themes/BootstrapSampleBillingTest.php`)**:
+  * Created `MobileBillingApiTest.php` with 5 tests and 37 assertions verifying WebView Bearer token authentication, unauthenticated login redirects, mobile plans API with promotions, mobile subscription lifecycle with trial claims, and coupon validation (100% pass rate).
+  * Created `BootstrapSampleBillingTest.php` with 5 tests and 30 assertions verifying theme plans view, landing showcase on welcome page, dashboard expiration warnings, printable invoice layout, and developer hooks execution (100% pass rate).
+
 ### Double-Entry PTS Ledger Engine & Banking-Grade Mathematical Verification (`DoubleEntryLedgerService`, `pts_ledger_entries`, `myads:pts:audit`)
 * **Double-Entry PTS Ledger Architecture (`pts_ledger_entries`, `PtsLedgerEntry.php`, `database/migrations/2026_11_12_000001_create_pts_ledger_entries_table.php`)**:
   * Implemented a robust, banking-grade double-entry accounting ledger where every transaction creates equal and opposite debit and credit entries ($\sum \Delta = 0.00$) grouped by a unique `transaction_uuid`.

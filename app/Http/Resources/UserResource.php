@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'pts' => $this->pts,
             'verified' => $this->hasVerifiedBadge(),
             'profile_badge_color' => $this->profileBadgeColor(),
+            'subscription_badge' => app(\App\Services\Billing\SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($this->id),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
         ];
     }

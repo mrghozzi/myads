@@ -85,6 +85,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackSeoMetrics::class,
             \App\Http\Middleware\TwoFactorMiddleware::class,
             \App\Http\Middleware\CaptureReferral::class,
+            \App\Http\Middleware\AuthenticateMobileWebViewToken::class,
         ]);
         $middleware->api(append: [
             \App\Http\Middleware\SecurityHeaders::class,
@@ -97,6 +98,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.key' => \App\Http\Middleware\RequireMobileApiKey::class,
             'guest.cache' => \App\Http\Middleware\GuestPageCacheMiddleware::class,
         ]);
+
+        $middleware->prependToPriorityList(
+            before: [
+                \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+                \Illuminate\Auth\Middleware\Authenticate::class,
+            ],
+            prepend: \App\Http\Middleware\AuthenticateMobileWebViewToken::class
+        );
 
         $middleware->redirectTo(
             guests: '/login',

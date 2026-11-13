@@ -15,6 +15,11 @@ class SubscriptionSettings
 
     private static ?array $cached = null;
 
+    public static function clearCache(): void
+    {
+        self::$cached = null;
+    }
+
     public static function all(): array
     {
         if (self::$cached !== null) {
