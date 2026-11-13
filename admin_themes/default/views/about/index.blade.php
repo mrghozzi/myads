@@ -492,31 +492,39 @@
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
                                     <h6 class="fw-bold mb-1">v4.7.0 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Developer Platform &amp; REST API Ecosystem (OAuth 2.1 &amp; PKCE, PAT Tokens, Webhooks with HMAC-SHA256, OpenAPI 3.1 &amp; Interactive Playground, Embed Widgets), Dedicated Support Forum (/support) with 5 Categorized Channels &amp; Solution Badges, Direct Technical Support Tickets Engine (/tickets &amp; /admin/tickets), Comprehensive Help &amp; Knowledge Center (/help) with Dynamic Site Name Resolution &amp; AJAX Voting, Universal In-Admin Widget Customizer Engine across All 12 Native Widgets, Glassmorphic Landing Footer Customizer, Zero-Vulnerability Security Remediation (Vite 8.3.5 &amp; Dependabot Patches), and Full 14-Language Localization Parity.</p>
+                                    <p class="text-muted fs-13 mb-3">Zero-Trust Security Hardening, AI Support Deflection Engine, Webhook Replay Attack Protection v2, Strict Nonce-Based CSP, Cloudflare Turnstile Bot Defense, Limitless &amp; Secure Plugin Architecture Overhaul, Enterprise VIP Billing &amp; Revenue Engine Modernization, Promo Coupons &amp; Free Trials, Mobile App &amp; WebView Token Bridge, Double-Entry PTS Ledger Engine, Point History Statement Overhaul &amp; CSV Export, Dual DocumentRoot Architecture, and FCM Push Notification Parity.</p>
                                     <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Enterprise Billing</span>
+                                            <span class="text-muted fs-13">Complete VIP subscription revolution (<code>/billing</code>, <code>/plans</code>, <code>/admin/billing</code>) featuring 100% Ad-Free browsing, 2x–10x PTS multipliers, Traffic Exchange priority surge, 0% store fees, 10-dimension Feature Comparison Matrix, printable corporate tax invoices (<code>#INV-...</code>), and executive SaaS KPI metrics (ARR, ARPU, Conversion Rate).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Coupons &amp; Trials</span>
+                                            <span class="text-muted fs-13">Time-limited plan discounts with real-time countdowns, promo coupon engine (<code>/admin/billing/coupons</code>) supporting percent/fixed discounts with instant AJAX validation, 1-click free trial activation, visitor landing showcase, and extensible theme card hooks.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Zero-Trust Security</span>
+                                            <span class="text-muted fs-13">Dual DocumentRoot resolution across <code>public/index.php</code> and root <code>index.php</code>, strict per-request cryptographic nonce Content-Security-Policy (CSP), Cloudflare Turnstile CAPTCHA-free human verification in <code>/admin/security</code>, and Webhooks v2 with timestamp replay attack defense (<code>X-MYADS-Timestamp</code>, <code>X-MYADS-Signature</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">AI Support Deflection</span>
+                                            <span class="text-muted fs-13">Intelligent bilingual AI deflection engine (<code>SupportDeflectionService</code>, <code>/tickets/deflect</code>, <code>/support/deflect</code>) with Arabic text normalization, real-time Help Center and verified solved topics scanning, and interactive suggestion cards.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">PTS Double-Entry</span>
+                                            <span class="text-muted fs-13">Banking-grade double-entry accounting ledger (<code>pts_ledger_entries</code>) with dedicated system contra accounts, zero-balance variance integrity, automated CLI audit (<code>php artisan myads:pts:audit</code>), and high-performance statement history with running balances and streaming UTF-8 CSV export.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Mobile &amp; FCM</span>
+                                            <span class="text-muted fs-13">Seamless WebView Bearer token bridge (<code>AuthenticateMobileWebViewToken</code>), native mobile billing REST API, Flutter subscription badges sync, and dual-protocol Firebase Cloud Messaging (FCM HTTP v1 / legacy) push notification engine.</span>
+                                        </div>
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1">Developer API</span>
                                             <span class="text-muted fs-13">Modernized developer platform with OAuth 2.1 &amp; PKCE compliance (RFC 7636/6749) for public/confidential clients, token revocation (RFC 7009), personal access tokens (PAT), event-driven Webhooks with HMAC-SHA256 signatures, API telemetry &amp; RFC rate limit headers, in-browser API Playground with OpenAPI 3.1.0 specifications, and auto-resizing HTML embed widgets.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Support Forum</span>
-                                            <span class="text-muted fs-13">Autonomous dedicated support forum (<code>/support</code>) completely decoupled from general community discussions, pre-seeded with 5 structured channels, solved/unsolved status filtering, staff response badges, and 1-click verified solution badges with +10 PTS reputation awards.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Tickets Engine</span>
-                                            <span class="text-muted fs-13">Private, direct-to-staff technical support ticketing suite (<code>/tickets</code>, <code>/admin/tickets</code>) with collision-free ticket reference numbering (<code>TKT-YYYYMMDD-XXXX</code>), 4 specialized departments, 4 urgency priority levels, secure file attachments up to 5MB, and admin moderation hub.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Help Center</span>
-                                            <span class="text-muted fs-13">10-category, 27-tutorial interactive Help Center (<code>/help</code>) with dynamic database site title resolution eliminating hardcoded branding, debounced real-time keyword search, and AJAX helpfulness rating engine ("👍 Yes / 👎 No").</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Widget Customizer</span>
-                                            <span class="text-muted fs-13">Universal in-admin customizer engine across all 12 native widgets in <code>/admin/widgets</code>, unified JSON config serialization, and overhauled glassmorphic Landing Footer widget (<code>widget_landing_footer.blade.php</code>) with social links and customizable footer sections.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-security mt-1">Security &amp; i18n</span>
-                                            <span class="text-muted fs-13">Upgraded <code>vite</code> to 8.3.5 and <code>follow-redirects</code> to 1.16.1 eliminating all GitHub Dependabot security advisories, dynamic sitemap stylesheet auto-synchronization, and achieved 100% key parity across all 14 supported languages and 8 localization catalogs.</span>
+                                            <span class="changelog-badge badge-feature mt-1">Support Suite</span>
+                                            <span class="text-muted fs-13">Autonomous dedicated support forum (<code>/support</code>) with 5 structured channels and 1-click verified solution badges (+10 PTS), private technical support tickets engine (<code>/tickets</code>, <code>/admin/tickets</code>), 10-category 27-guide Help Center (<code>/help</code>), and universal in-admin widget customizer across all 12 native widgets.</span>
                                         </div>
                                     </div>
                                 </div>
