@@ -56,10 +56,20 @@ Designed for the first-party Flutter mobile application and official platform co
           "id": 42,
           "username": "developer",
           "name": "Developer Name",
-          "avatar_url": "https://domain.com/upload/avatar.png"
+          "avatar_url": "https://domain.com/upload/avatar.png",
+          "subscription_badge": {
+              "label": "VIP PRO",
+              "color": "#10b981"
+          }
       }
   }
   ```
+
+**Mobile WebView Token Bridge (`AuthenticateMobileWebViewToken`):**  
+When the Flutter companion client (`myads_app`) or external webview displays authenticated platform surfaces (`/billing`, `/plans`, `/support`), it provides the Sanctum bearer token via standard `Authorization: Bearer {token}` header or `?auth_token={token}` query parameter. The `AuthenticateMobileWebViewToken` middleware runs with priority before Laravel's `AuthenticatesRequests` pipeline, automatically authenticating the member into the web session (`Auth::guard('web')->login($user)`). This eliminates guest redirection to `/login` and provides a frictionless, zero-login embedded mobile experience.
+
+**VIP Subscription Badges in API Resources:**  
+All member representations served via `UserResource`, `UserProfileResource`, and nested author objects in statuses and comments automatically serialize `subscription_badge` (`{"label": "...", "color": "..."}` or `null`), allowing mobile clients to dynamically render branded VIP pill badges next to member names across feeds, profiles, and comment trees.
 
 ### B. Rate Limiting Rules
 Public and authenticated API endpoints are protected with sliding-window rate limiters:
@@ -1827,6 +1837,170 @@ All endpoints require both `X-API-KEY` and Sanctum `Authorization: Bearer {token
       "is_pinned": true
     }
     ```
+
+---
+
+### 8.9. Mobile Paid Subscription & Billing REST API (`/api/billing/*`)
+
+The Billing REST API enables the Flutter mobile companion app (`myads_app`) and third-party native clients to consume subscription plans, track active memberships, validate promo coupons in real time, and claim free trials.
+
+All endpoints require both the global `X-API-KEY` header and Sanctum `Authorization: Bearer {token}` header.
+
+#### 1. List Active Subscription Plans
+- **Endpoint:** `GET /api/billing/plans`
+- **Headers:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`
+- **Query Parameters:**
+  - `search`: (optional, string) Filter plans by name or description.
+- **Description:** Returns all active subscription plans formatted for mobile consumption, including time-limited sale promotions, countdown timers in seconds, free trial availability, and humanized benefit statements.
+- **Response (`HTTP 200 OK`):**
+  ```json
+  {
+    "enabled": true,
+    "current_subscription": {
+      "id": 18,
+      "plan_id": 2,
+      "plan_name": "Pro Yearly Super",
+      "status": "active",
+      "is_trial": false,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2027-11-13T02:00:00Z",
+      "days_left": 365
+    },
+    "plans": [
+      {
+        "id": 2,
+        "name": "Pro Yearly Super",
+        "description": "Best plan for professional webmasters",
+        "duration_days": 365,
+        "is_lifetime": false,
+        "base_price": 100.0,
+        "sale_price": 75.0,
+        "current_price": 75.0,
+        "is_on_sale": true,
+        "discount_percentage": 25,
+        "sale_ends_at": "2026-11-20T02:00:00Z",
+        "sale_seconds_remaining": 604800,
+        "has_trial": true,
+        "trial_days": 7,
+        "is_featured": true,
+        "recommended_text": "POPULAR CHOICE",
+        "accent_color": "#10b981",
+        "layout_style": "glassmorphism",
+        "marketing_bullets": [
+          "Priority placement",
+          "No ad fees"
+        ],
+        "benefits": [
+          "100% Ad-Free browsing experience across the platform",
+          "2.0x PTS Reward Multiplier on all visit and video exchanges",
+          "Golden Verified VIP Badge on profile and comments"
+        ],
+        "is_current_plan": true,
+        "checkout_url": "https://domain.com/billing/checkout/2",
+        "trial_url": "https://domain.com/plans/2/trial"
+      }
+    ]
+  }
+  ```
+
+#### 2. Get Current Member Subscription Details
+- **Endpoint:** `GET /api/billing/subscription`
+- **Headers:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`
+- **Description:** Returns the authenticated member's active subscription status, trial indicator, expiration dates, days remaining, expiring soon alert flag (`<= 7` days), profile badge metadata, and queued future subscription (if renewing with a different plan).
+- **Response (`HTTP 200 OK` - Active Subscription):**
+  ```json
+  {
+    "enabled": true,
+    "has_active_subscription": true,
+    "subscription": {
+      "id": 18,
+      "plan_id": 2,
+      "plan_name": "Pro Yearly Super",
+      "status": "active",
+      "is_trial": false,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2026-11-18T02:00:00Z",
+      "days_left": 5,
+      "is_expiring_soon": true,
+      "profile_badge": {
+        "label": "PRO ELITE",
+        "color": "#10b981"
+      },
+      "entitlements": {
+        "ad_free": true,
+        "pts_multiplier": 2.0,
+        "subscription_verified_badge": true
+      }
+    },
+    "queued_subscription": null,
+    "plans_url": "https://domain.com/plans",
+    "billing_url": "https://domain.com/billing"
+  }
+  ```
+
+#### 3. Real-Time Promo Coupon Validation
+- **Endpoint:** `POST /api/billing/validate-coupon`
+- **Headers:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`, `Content-Type: application/json`
+- **Payload:**
+  ```json
+  {
+    "plan_id": 2,
+    "coupon_code": "SAVE20"
+  }
+  ```
+- **Description:** Validates promo discount codes against the target plan in real time, calculating discount deduction amounts and final checkout pricing.
+- **Response (`HTTP 200 OK` - Valid Coupon):**
+  ```json
+  {
+    "valid": true,
+    "code": "SAVE20",
+    "discount_type": "percent",
+    "discount_value": 20.0,
+    "discount_amount": 15.0,
+    "final_amount": 60.0,
+    "message": "Coupon SAVE20 applied successfully (-20%)."
+  }
+  ```
+- **Response (`HTTP 200 OK` - Invalid / Expired Coupon):**
+  ```json
+  {
+    "valid": false,
+    "message": "Coupon code is invalid or has expired."
+  }
+  ```
+
+#### 4. Claim Instant Free Trial
+- **Endpoint:** `POST /api/billing/trial`
+- **Headers:** `X-API-KEY: {KEY}`, `Authorization: Bearer {TOKEN}`, `Content-Type: application/json`
+- **Payload:**
+  ```json
+  {
+    "plan_id": 3
+  }
+  ```
+- **Description:** Instantly starts a free trial for the specified plan without requiring payment details or credit cards. Automatically checks eligibility to ensure a member can only claim one trial per plan.
+- **Response (`HTTP 200 OK` - Success):**
+  ```json
+  {
+    "success": true,
+    "message": "Your free trial for Starter Trial (7 days) has started successfully!",
+    "subscription": {
+      "id": 19,
+      "plan_id": 3,
+      "plan_name": "Starter Trial",
+      "is_trial": true,
+      "starts_at": "2026-11-13T02:00:00Z",
+      "ends_at": "2026-11-20T02:00:00Z"
+    }
+  }
+  ```
+- **Response (`HTTP 422 Unprocessable Content` - Duplicate Trial Attempt):**
+  ```json
+  {
+    "success": false,
+    "message": "You have already used the free trial for this plan."
+  }
+  ```
 
 ---
 
