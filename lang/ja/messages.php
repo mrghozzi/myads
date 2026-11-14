@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'アクティブ化された',
@@ -2787,6 +2787,7 @@ return [
     'dev_app_secret_rotated' => 'クライアント シークレットは正常にローテーションされました。',
     'admin_module_developers' => '開発者',
     'new_developer_apps_pending' => ':count 新しい開発者アプリは審査待ちです',
+    'developer_apps' => '開発者アプリ',
     'dev_scope_identity_read' => 'アイデンティティの読み取り',
     'dev_scope_identity_read_desc' => 'メンバー アカウント ID と基本的なパブリック ID フィールドを読み取ります。',
     'dev_scope_profile_read' => 'プロフィールを読む',

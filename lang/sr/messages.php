@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'Активирано',
@@ -2787,6 +2787,7 @@ return [
     'dev_app_secret_rotated' => 'Тајна шифра клијента је успешно ротирана.',
     'admin_module_developers' => 'Девелоперс',
     'new_developer_apps_pending' => 'КСВАР0Кс Нове апликације за програмере чекају преглед',
+    'developer_apps' => 'Апликације за програмере',
     'dev_scope_identity_read' => 'Прочитајте идентитет',
     'dev_scope_identity_read_desc' => 'Прочитајте идентификатор налога члана и основна поља јавног идентитета.',
     'dev_scope_profile_read' => 'Прочитајте профил',

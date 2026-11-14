@@ -3566,6 +3566,7 @@ return [
     'danger_zone' => 'منطقة الخطر',
     'admin_module_developers' => 'المطورين',
     'new_developer_apps_pending' => ':count تطبيقات مطورين جديدة بانتظار المراجعة',
+    'developer_apps' => 'تطبيقات المطورين',
     'dev_scope_cat_identity' => 'الهوية والملف الشخصي',
     'dev_scope_cat_content' => 'المحتوى والتفاعل',
     'dev_scope_cat_messaging' => 'الرسائل والإشعارات',

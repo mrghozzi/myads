@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'فعال شده',
@@ -3294,6 +3294,7 @@ return [
     'dev_app_secret_rotated' => 'Client secret rotated successfully.',
     'admin_module_developers' => 'Developers',
     'new_developer_apps_pending' => ':count New Developer Apps pending review',
+    'developer_apps' => 'برنامه‌های توسعه‌دهنده',
     'dev_scope_identity_read' => 'Read Identity',
     'dev_scope_identity_read_desc' => 'Read the member account identifier and basic public identity fields.',
     'dev_scope_profile_read' => 'Read Profile',

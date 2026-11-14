@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'Aktiviert',
@@ -3299,6 +3299,7 @@ return [
     'danger_zone' => 'Danger Zone',
     'admin_module_developers' => 'Developers',
     'new_developer_apps_pending' => ':count New Developer Apps pending review',
+    'developer_apps' => 'Entwickler-Apps',
     'dev_scope_identity_read' => 'Read Identity',
     'dev_scope_identity_read_desc' => 'Read the member account identifier and basic public identity fields.',
     'dev_scope_profile_read' => 'Read Profile',

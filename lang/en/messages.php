@@ -3562,6 +3562,7 @@ return [
     'danger_zone' => 'Danger Zone',
     'admin_module_developers' => 'Developers',
     'new_developer_apps_pending' => ':count New Developer Apps pending review',
+    'developer_apps' => 'Developer Apps',
     'dev_scope_cat_identity' => 'Identity & Profile',
     'dev_scope_cat_content' => 'Content & Interactions',
     'dev_scope_cat_messaging' => 'Messages & Notifications',

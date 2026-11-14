@@ -2791,6 +2791,7 @@ return [
     'delete_app_warning' => '刪除此應用程式將永久撤銷所有授予的授權、活動權杖和 API 憑證。',
     'danger_zone' => '危險區域',
     'admin_module_developers' => '開發商',
+    'developer_apps' => '開發者應用程式',
     'new_developer_apps_pending' => ':count 新開發者應用程式等待審核',
     'dev_scope_identity_read' => '讀取身份',
     'dev_scope_identity_read_desc' => '閱讀會員帳戶識別碼和基本公共身分欄位。',

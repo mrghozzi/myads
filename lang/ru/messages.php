@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'Активировано',
@@ -2787,6 +2787,7 @@ return [
     'dev_app_secret_rotated' => 'Секрет клиента успешно заменен.',
     'admin_module_developers' => 'Разработчики',
     'new_developer_apps_pending' => 'Новые приложения для разработчиков :count ожидают рассмотрения',
+    'developer_apps' => 'Приложения разработчиков',
     'dev_scope_identity_read' => 'Чтение личности',
     'dev_scope_identity_read_desc' => 'Прочтите идентификатор учетной записи участника и основные общедоступные поля идентификации.',
     'dev_scope_profile_read' => 'Читать профиль',

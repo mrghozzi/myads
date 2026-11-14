@@ -2791,6 +2791,7 @@ return [
     'delete_app_warning' => '删除此应用程序将永久撤销所有授予的授权、活动令牌和 API 凭据。',
     'danger_zone' => '危险区域',
     'admin_module_developers' => '开发商',
+    'developer_apps' => '开发者应用',
     'new_developer_apps_pending' => ':count 新开发者应用程序等待审核',
     'dev_scope_identity_read' => '读取身份',
     'dev_scope_identity_read_desc' => '阅读会员帐户标识符和基本公共身份字段。',
