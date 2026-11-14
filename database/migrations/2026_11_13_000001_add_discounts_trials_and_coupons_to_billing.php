@@ -4,23 +4,34 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         if (Schema::hasTable('subscription_plans')) {
             Schema::table('subscription_plans', function (Blueprint $table): void {
                 if (!Schema::hasColumn('subscription_plans', 'sale_price')) {
-                    $table->decimal('sale_price', 12, 2)->nullable()->after('base_price');
+                    $col = $table->decimal('sale_price', 12, 2)->nullable();
+                    if (Schema::hasColumn('subscription_plans', 'base_price')) {
+                        $col->after('base_price');
+                    }
                 }
                 if (!Schema::hasColumn('subscription_plans', 'sale_ends_at')) {
-                    $table->timestamp('sale_ends_at')->nullable()->after('sale_price');
+                    $col = $table->timestamp('sale_ends_at')->nullable();
+                    if (Schema::hasColumn('subscription_plans', 'sale_price')) {
+                        $col->after('sale_price');
+                    }
                 }
                 if (!Schema::hasColumn('subscription_plans', 'trial_days')) {
-                    $table->unsignedInteger('trial_days')->nullable()->after('sale_ends_at');
+                    $col = $table->unsignedInteger('trial_days')->nullable();
+                    if (Schema::hasColumn('subscription_plans', 'sale_ends_at')) {
+                        $col->after('sale_ends_at');
+                    }
                 }
                 if (!Schema::hasColumn('subscription_plans', 'layout_style')) {
-                    $table->string('layout_style', 50)->default('default')->after('accent_color');
+                    $col = $table->string('layout_style', 50)->default('default');
+                    if (Schema::hasColumn('subscription_plans', 'accent_color')) {
+                        $col->after('accent_color');
+                    }
                 }
             });
         }
@@ -49,27 +60,48 @@ return new class extends Migration
         if (Schema::hasTable('billing_orders')) {
             Schema::table('billing_orders', function (Blueprint $table): void {
                 if (!Schema::hasColumn('billing_orders', 'billing_coupon_id')) {
-                    $table->unsignedBigInteger('billing_coupon_id')->nullable()->after('subscription_plan_id')->index();
+                    $col = $table->unsignedBigInteger('billing_coupon_id')->nullable()->index();
+                    if (Schema::hasColumn('billing_orders', 'subscription_plan_id')) {
+                        $col->after('subscription_plan_id');
+                    }
                 }
                 if (!Schema::hasColumn('billing_orders', 'coupon_code')) {
-                    $table->string('coupon_code', 50)->nullable()->after('billing_coupon_id');
+                    $col = $table->string('coupon_code', 50)->nullable();
+                    if (Schema::hasColumn('billing_orders', 'billing_coupon_id')) {
+                        $col->after('billing_coupon_id');
+                    }
                 }
                 if (!Schema::hasColumn('billing_orders', 'discount_amount')) {
-                    $table->decimal('discount_amount', 12, 2)->default(0)->after('base_amount');
+                    $col = $table->decimal('discount_amount', 12, 2)->default(0);
+                    if (Schema::hasColumn('billing_orders', 'base_amount')) {
+                        $col->after('base_amount');
+                    }
                 }
                 if (!Schema::hasColumn('billing_orders', 'is_trial')) {
-                    $table->boolean('is_trial')->default(false)->after('status')->index();
+                    $col = $table->boolean('is_trial')->default(false)->index();
+                    if (Schema::hasColumn('billing_orders', 'status')) {
+                        $col->after('status');
+                    }
                 }
             });
         }
 
         if (Schema::hasTable('member_subscriptions')) {
             Schema::table('member_subscriptions', function (Blueprint $table): void {
+                if (!Schema::hasColumn('member_subscriptions', 'ends_at')) {
+                    $table->timestamp('ends_at')->nullable()->index();
+                }
                 if (!Schema::hasColumn('member_subscriptions', 'is_trial')) {
-                    $table->boolean('is_trial')->default(false)->after('status')->index();
+                    $col = $table->boolean('is_trial')->default(false)->index();
+                    if (Schema::hasColumn('member_subscriptions', 'status')) {
+                        $col->after('status');
+                    }
                 }
                 if (!Schema::hasColumn('member_subscriptions', 'trial_ends_at')) {
-                    $table->timestamp('trial_ends_at')->nullable()->after('ends_at');
+                    $col = $table->timestamp('trial_ends_at')->nullable();
+                    if (Schema::hasColumn('member_subscriptions', 'ends_at')) {
+                        $col->after('ends_at');
+                    }
                 }
             });
         }
