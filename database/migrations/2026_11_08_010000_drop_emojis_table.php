@@ -8,10 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * @allow-destructive
      */
     public function up(): void
     {
-        Schema::dropIfExists('emojis');
+        if (Schema::hasTable('emojis')) {
+            Schema::getConnection()->getSchemaBuilder()->dropIfExists('emojis');
+        }
     }
 
     /**

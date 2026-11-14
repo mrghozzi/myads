@@ -115,6 +115,52 @@ PHP);
         }
     }
 
+    public function test_update_safety_service_allows_annotated_intentional_destructive_migrations(): void
+    {
+        $path = database_path('migrations/2099_01_01_000250_annotated_destructive_probe.php');
+
+        File::put($path, <<<'PHP'
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     * @allow-destructive
+     */
+    public function up(): void
+    {
+        Schema::dropIfExists('obsolete_table');
+    }
+
+    public function down(): void
+    {
+    }
+};
+PHP);
+
+        try {
+            $report = app(UpdateSafetyService::class)->run();
+
+            $this->assertTrue($report->isSafe());
+            $this->assertContains('2099_01_01_000250_annotated_destructive_probe', $report->pendingMigrations);
+            $this->assertSame([], $report->destructiveMigrations);
+        } finally {
+            File::delete($path);
+        }
+    }
+
+    public function test_drop_emojis_migration_is_accepted_by_safety_preflight(): void
+    {
+        $safety = app(UpdateSafetyService::class);
+        $matches = $safety->inspectMigrationFile(database_path('migrations/2026_11_08_010000_drop_emojis_table.php'));
+
+        $this->assertSame([], $matches, 'The drop_emojis_table migration must be safe and pass inspection.');
+    }
+
     public function test_update_preflight_command_returns_failure_for_destructive_migration(): void
     {
         $path = database_path('migrations/2099_01_01_000300_command_destructive_probe.php');
