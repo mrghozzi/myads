@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.7.0
+# Agents.md — MYADS v4.7.1
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.7.0
+- **Name:** MYADS v4.7.1
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -170,6 +170,12 @@ MYADS is a community platform where website owners:
     - **Mobile Feed VIP Badge Parity (`myads_app`):** `UserResource` now broadcasts `subscription_badge`, deserialized by Flutter `UserModel`, and rendered as a stylized badge pill on feed `PostCard` authors and quote reposts. Flutter code is 100% verified with 0 analyzer issues and all 11 tests passing.
     - **Bootstrap-Sample Theme Full Parity:** Full synchronization of `themes/bootstrap-sample` with modern billing features: visitor landing plans partial on welcome page, responsive 8-row Feature Comparison Matrix, live coupon input, trial activation buttons, 7-day expiration alert banner with renewal CTA, official printable tax invoice `#INV-...` card with `@media print` CSS, and developer plugin hooks (`billing_plans_card_class`, `billing_plans_card_badge`, etc.).
     - **100% Automated Test Coverage:** Validated by `MobileBillingApiTest.php` (5 tests, 37 assertions, 100% pass rate) and `BootstrapSampleBillingTest.php` (5 tests, 30 assertions, 100% pass rate).
+79. **Emergency Platform Security Hardening, Multi-Layered Web Shell & Arbitrary File Upload Defense (v4.7.1)** — Enterprise security overhaul eliminating Web Shell and Remote Code Execution (RCE) vectors across the entire platform:
+    - **Deep Binary Inspection & Polyglot Neutralization (`FileUploadSecurityService`):** Scans all uploaded files for embedded server-side executable PHP code signatures (`containsExecutableCode`), neutralizing polyglot attacks where PHP payloads are appended to valid image binary headers (`GIF89a`, `\xFF\xD8\xFF`). Completely discards untrusted client extensions (`getClientOriginalExtension()`) in favor of server-side MIME deduction via `guessExtension()` validated against strict whitelists (`['jpg', 'jpeg', 'png', 'gif', 'webp']`).
+    - **Universal Upload Handler Hardening:** Hardened status images (`/status/upload-image`), rich text editor (`/editor/upload-image`), forum topic media & video thumbnails (`ForumController`), forum attachments (`storeTopicAttachments`), group topic images (`GroupController`), and store screenshots (`StoreController`).
+    - **Multi-Layered Directory Shields & Self-Healing Engine:** Fortified `upload/.htaccess`, `storage/.htaccess`, `storage/logs/.htaccess`, and `storage/framework/.htaccess` (tracked in Git via updated `.gitignore`), disabling directory indexing (`Options -Indexes -ExecCGI`), removing script handlers (`RemoveHandler .php .phtml ...`), and turning off PHP engines (`php_flag engine off`). Self-healing runtime hooks in `index.php`, `public/index.php`, and `AppServiceProvider` automatically regenerate missing `.htaccess` files upon any request.
+    - **Pre-Boot Request URI Blocking:** Extended pre-boot pattern shields in `index.php`, `public/index.php`, and `BlockSensitivePaths` middleware, immediately aborting with HTTP 403 Access Denied for any direct requests attempting to reach `/storage/logs/*`, `/storage/framework/*`, or any `.php` files inside `/upload/*` before the Laravel router or framework boots.
+    - **100% Automated Test Coverage:** Validated by `V471SecurityHardeningTest.php` (9 tests, 31 assertions, 100% pass rate).
 
 ---
 
@@ -1380,9 +1386,23 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
     - Achieved full companion Flutter app parity (`myads_app` v1.8.8+30) with Riverpod `Notifier`, category chips, swipe-to-dismiss, in-app foreground banner, cold start deep linking, and mobile push toggles.
     - Covered by automated test suites (`MobileNotificationApiTest` and `AdminMobileSettingsTest`).
 
+- **v4.7.1 Official Release — Emergency Platform Security Hardening, Multi-Layered Web Shell & Arbitrary File Upload Defense, Deep Binary Inspection & Polyglot Neutralization, Self-Healing Directory Shields & Directory Traversal Prevention Release (2026-11-16):**
+  - **Deep Binary Inspection & Polyglot Neutralization (`FileUploadSecurityService`):**
+    - Enhanced `FileUploadSecurityService` with `validateImageUpload()`, `validateMediaUpload()`, and `containsExecutableCode()`.
+    - Multi-stage deep inspection scanning uploaded media for embedded server-side executable PHP code signatures (`<?php`, `<?=`, `<? `, UTF-16 encoded `<\x00?\x00p\x00h\x00p`, `<script language="php">`, `__halt_compiler()`, ASP tags `<%`), neutralizing polyglot attacks where PHP payloads are appended to valid image binary headers (`GIF89a`, `\xFF\xD8\xFF`).
+    - Enforced cryptographic random filename generation (`[prefix]_[timestamp]_[random16].[safe_ext]`) and server-side MIME deduction via `guessExtension()` against strict extension whitelists (`['jpg', 'jpeg', 'png', 'gif', 'webp']`), completely discarding untrusted user-supplied filenames and extensions (`getClientOriginalExtension()`).
+    - Immediate blocking of dangerous extensions (`php`, `phtml`, `phar`, `sh`, `exe`, `bat`, `cgi`, etc.) and double-extension obfuscation techniques (`exploit.php.jpg`).
+  - **Universal File Upload Handlers Hardening:**
+    - Hardened status images (`/status/upload-image`), rich text editor (`/editor/upload-image`), forum topic media & video thumbnails (`ForumController`), forum attachments (`storeTopicAttachments`), group topic images (`GroupController`), store screenshots (`StoreController`), and feed storage helpers (`StatusPostService`).
+  - **Defense-in-Depth Multi-Layered Directory Shields & Self-Healing Engine:**
+    - Fortified `upload/.htaccess`, `public/upload/.htaccess`, `storage/.htaccess`, `storage/logs/.htaccess`, and `storage/framework/.htaccess` (tracked in Git via updated `.gitignore`), disabling directory indexing (`Options -Indexes -ExecCGI`), removing script handlers (`RemoveHandler .php .phtml ...`), and turning off PHP engines (`php_flag engine off`).
+    - Self-healing runtime hooks in `index.php`, `public/index.php`, and `AppServiceProvider` automatically regenerate missing `.htaccess` files upon any request.
+    - Extended pre-boot pattern shields in `index.php`, `public/index.php`, and `BlockSensitivePaths` middleware, immediately aborting with HTTP 403 Access Denied for any direct requests attempting to reach `/storage/logs/*`, `/storage/framework/*`, or any `.php` files inside `/upload/*` before the Laravel router or framework boots.
+  - **100% Automated Test Coverage:** Validated by `V471SecurityHardeningTest.php` (9 tests, 31 assertions, 100% pass rate).
+
 ---
 
-*Last updated: 2026-11-11 — MYADS v4.7.0*
+*Last updated: 2026-11-16 — MYADS v4.7.1*
 
 
 

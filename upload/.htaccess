@@ -1,0 +1,31 @@
+# ==============================================================================
+# MYADS SECURITY SUITE: Upload Directory Hardening
+# Strictly prevents execution of server-side scripts in this directory.
+# ==============================================================================
+
+Options -Indexes -ExecCGI
+
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+<FilesMatch "\.(?i:php|phtml|php3|php4|php5|php7|php8|pht|phar|cgi|pl|py|sh|bash|exe|bat|cmd|vbs|scr|msi|jar|dll|htaccess|htpasswd|ini|env|config|svgz)$">
+    Order Allow,Deny
+    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

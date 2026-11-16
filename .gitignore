@@ -34,6 +34,11 @@ Thumbs.db
 !/upload/avatar.png
 !/upload/cover.jpg
 !/upload/group.png
+!/upload/.htaccess
+!/upload/**/.htaccess
+!/public/upload/.htaccess
+!/storage/.htaccess
+!/storage/**/.htaccess
 /Documents
 !/Documents/
 !/Documents/UPGRADE.md
@@ -107,6 +112,8 @@ custom_variables.css
 !/tests/Feature/Themes/BootstrapSampleBillingTest.php
 !/tests/Feature/Themes/
 !/tests/Feature/Themes/*
+!/tests/Feature/Security/
+!/tests/Feature/Security/*
 ~/.pi/
 /wiki/
 /brain/

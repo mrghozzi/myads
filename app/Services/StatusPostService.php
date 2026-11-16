@@ -783,27 +783,18 @@ class StatusPostService
 
     private function storeMediaFile($file, int $topicId, int $userId, string $kind): string
     {
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateMediaUpload($file, self::ALLOWED_MEDIA_EXTENSIONS, $kind . '_' . $topicId);
 
-        // SECURITY: Block dangerous file extensions
-        if (!in_array($extension, self::ALLOWED_MEDIA_EXTENSIONS, true)) {
-            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed: ' . $extension);
+        if (!$validation['valid']) {
+            throw new \RuntimeException($validation['error'] ?: __('messages.file_type_not_allowed'));
         }
 
-        // SECURITY: Block dangerous MIME types
-        $mimeType = strtolower((string) ($file->getClientMimeType() ?: ''));
-        foreach (self::BLOCKED_MIME_PREFIXES as $blockedPrefix) {
-            if (str_starts_with($mimeType, $blockedPrefix)) {
-                throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
-            }
-        }
-
-        $filename = $kind . '_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
+        $filename = $validation['filename'];
+        $extension = $validation['extension'];
         $destinationPath = base_path('upload');
 
-        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
-            throw new \RuntimeException('Unable to create media attachment directory.');
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
         $file->move($destinationPath, $filename);
         $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;

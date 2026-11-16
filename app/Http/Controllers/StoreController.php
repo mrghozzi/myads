@@ -2656,20 +2656,22 @@ class StoreController extends Controller
     public function uploadScreenshot(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image' => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
         $file = $request->file('image');
-        $extension = $file->getClientOriginalExtension();
-        $filename = 'ss_' . time() . '_' . Str::random(8) . '.' . $extension;
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateImageUpload($file, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'ss');
 
-        $destinationPath = base_path('upload/screenshots');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+        if (!$validation['valid']) {
+            return response()->json(['success' => false, 'error' => $validation['error']], 422);
         }
 
-        $file->move($destinationPath, $filename);
-        $relativePath = 'upload/screenshots/' . $filename;
+        $destinationPath = base_path('upload/screenshots');
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+
+        $file->move($destinationPath, $validation['filename']);
+        $relativePath = 'upload/screenshots/' . $validation['filename'];
 
         return response()->json([
             'success'  => true,

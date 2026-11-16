@@ -603,15 +603,15 @@ class ForumController extends Controller
             $imagePath = null;
             if ((int) $request->type === 4 && $request->hasFile('img')) {
                 $file = $request->file('img');
-                $extension = strtolower($file->getClientOriginalExtension() ?: 'bin');
-                // SECURITY: Whitelist allowed image extensions and sanitize filename
-                $allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-                if (!in_array($extension, $allowedImageExtensions, true)) {
-                    throw new \RuntimeException(__('messages.invalid_file_type'));
+                $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+                $validation = $securityService->validateImageUpload($file, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'topic');
+                if (!$validation['valid']) {
+                    throw new \RuntimeException($validation['error'] ?: __('messages.invalid_file_type'));
                 }
-                $filename = time() . '_' . Str::random(12) . '.' . $extension;
-                $file->move(base_path('upload'), $filename);
-                $imagePath = 'upload/' . $filename;
+                $destinationPath = base_path('upload');
+                \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+                $file->move($destinationPath, $validation['filename']);
+                $imagePath = 'upload/' . $validation['filename'];
             }
 
             $topicData = [
@@ -744,10 +744,15 @@ class ForumController extends Controller
 
             $thumbFile = $request->file('video_thumbnail') ?: $request->file('img');
             if ($thumbFile) {
-                $extension = strtolower($thumbFile->getClientOriginalExtension() ?: 'png');
-                $filename = time() . '_' . Str::random(12) . '.' . $extension;
-                $thumbFile->move(base_path('upload'), $filename);
-                $imagePath = 'upload/' . $filename;
+                $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+                $validation = $securityService->validateImageUpload($thumbFile, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'vthumb');
+                if (!$validation['valid']) {
+                    throw new \RuntimeException($validation['error'] ?: __('messages.invalid_file_type'));
+                }
+                $destinationPath = base_path('upload');
+                \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+                $thumbFile->move($destinationPath, $validation['filename']);
+                $imagePath = 'upload/' . $validation['filename'];
 
                 Option::updateOrCreate(
                     ['o_parent' => $topic->id, 'o_type' => 'image_post'],
@@ -1143,15 +1148,19 @@ class ForumController extends Controller
         }
 
         $destinationPath = base_path('upload');
-        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
-            throw new \RuntimeException('Unable to create forum attachment directory.');
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
+        $allowedTypes = array_filter(array_map('trim', explode(',', (string) ($settings['allowed_file_types'] ?? 'jpg,jpeg,png,gif,zip,pdf'))));
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
         $nextSortOrder = (int) ($topic->attachments()->max('sort_order') ?? 0);
 
         foreach ($files as $index => $file) {
-            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
-            $filename = 'topic_' . $topic->id . '_' . time() . '_' . Str::random(12) . '.' . $extension;
+            $validation = $securityService->validateMediaUpload($file, $allowedTypes, 'topic_' . $topic->id);
+            if (!$validation['valid']) {
+                throw new \RuntimeException($validation['error'] ?: __('messages.invalid_file_type'));
+            }
+
+            $filename = $validation['filename'];
             $originalName = $file->getClientOriginalName();
             $mimeType = (string) ($file->getClientMimeType() ?: '');
             $fileSize = (int) $file->getSize();

@@ -47,6 +47,10 @@ class AppServiceProvider extends ServiceProvider
         // Fix for shared hosting with 1000-byte max key length (utf8mb4)
         Schema::defaultStringLength(191);
 
+        // Security: Fortify public upload and storage directories against execution and unauthorized access
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected(base_path('upload'));
+        \App\Services\Security\FileUploadSecurityService::ensureStorageDirectoriesProtected();
+
         if (
             \App\Support\SecuritySettings::get('force_https')
             || str_starts_with((string) config('app.url'), 'https://')

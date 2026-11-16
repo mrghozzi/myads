@@ -33,17 +33,20 @@ class StatusController extends Controller
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'fimg' => 'required|image|max:10000',
+            'fimg' => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
         $file = $request->file('fimg');
-        $extension = $file->getClientOriginalExtension();
-        $filename = time() . '_' . Str::random(8) . '.' . $extension;
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateImageUpload($file, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'img');
 
-        $destinationPath = base_path('upload');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+        if (!$validation['valid']) {
+            return response('<div class="alert alert-danger">' . e($validation['error']) . '</div>', 422);
         }
+
+        $filename = $validation['filename'];
+        $destinationPath = base_path('upload');
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
         $file->move($destinationPath, $filename);
         $relativePath = 'upload/' . $filename;
@@ -63,17 +66,20 @@ class StatusController extends Controller
         $request->validate([
             // SECURITY: SVG removed — SVG files can contain embedded <script> tags
             // that execute in the browser, enabling Stored XSS attacks.
-            'image' => 'required|image|mimes:jpeg,png,gif,webp|max:5120',
+            'image' => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $file = $request->file('image');
-        $extension = $file->getClientOriginalExtension();
-        $filename = 'editor_' . time() . '_' . Str::random(10) . '.' . $extension;
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateImageUpload($file, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'editor');
 
-        $destinationPath = base_path('upload');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
+        if (!$validation['valid']) {
+            return response()->json(['error' => $validation['error']], 422);
         }
+
+        $filename = $validation['filename'];
+        $destinationPath = base_path('upload');
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
         $file->move($destinationPath, $filename);
         $url = asset('upload/' . $filename);
@@ -326,27 +332,17 @@ class StatusController extends Controller
 
     private function storeMediaFile($file, int $topicId, int $userId, string $kind): string
     {
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateMediaUpload($file, self::ALLOWED_MEDIA_EXTENSIONS, $kind . '_' . $topicId);
 
-        // Security: Block dangerous file extensions
-        if (!in_array($extension, self::ALLOWED_MEDIA_EXTENSIONS, true)) {
-            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed: ' . $extension);
+        if (!$validation['valid']) {
+            throw new \RuntimeException($validation['error'] ?: __('messages.file_type_not_allowed'));
         }
 
-        // Security: Block dangerous MIME types
-        $mimeType = strtolower((string) ($file->getClientMimeType() ?: ''));
-        foreach (self::BLOCKED_MIME_PREFIXES as $blockedPrefix) {
-            if (str_starts_with($mimeType, $blockedPrefix)) {
-                throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
-            }
-        }
-
-        $filename = $kind . '_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
+        $filename = $validation['filename'];
         $destinationPath = base_path('upload');
 
-        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
-            throw new \RuntimeException('Unable to create media attachment directory.');
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
         $file->move($destinationPath, $filename);
         return 'upload/' . $filename;

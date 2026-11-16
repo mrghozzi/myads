@@ -546,8 +546,15 @@ class GroupController extends Controller
             $statusType = (int) $request->input('type', 2) === 4 ? 4 : 2;
             if ($statusType === 4 && $request->hasFile('img')) {
                 $file = $request->file('img');
-                $filename = 'group_topic_' . $topic->id . '_' . time() . '_' . Str::random(10) . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
-                $file->move(base_path('upload'), $filename);
+                $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+                $validation = $securityService->validateImageUpload($file, \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'group_topic_' . $topic->id);
+                if (!$validation['valid']) {
+                    throw new \RuntimeException($validation['error'] ?: __('messages.invalid_file_type'));
+                }
+                $destinationPath = base_path('upload');
+                \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+                $file->move($destinationPath, $validation['filename']);
+                $filename = $validation['filename'];
 
                 Option::create([
                     'name' => (string) $time,

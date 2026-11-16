@@ -1,0 +1,15 @@
+# ==============================================================================
+# MYADS SECURITY SUITE: Storage Root Directory Protection
+# Prevents public web browsing and sensitive data leaks from storage.
+# ==============================================================================
+
+Options -Indexes
+
+# Block access to logs, SQLite databases, keys, environment, and framework caches
+<FilesMatch "\.(?i:log|sqlite|sqlite3|db|env|key|pem|crt|json|lock|yml|yaml|php|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>

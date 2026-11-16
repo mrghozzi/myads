@@ -44,6 +44,8 @@ class BlockSensitivePaths
         '#^\.editorconfig$#i',
         // Internal directories that should never be web-accessible
         '#^(storage|bootstrap|config|database|app|routes|tests|vendor|brain|~)(/|$)#i',
+        // Uploaded PHP or executable scripts inside public upload directory
+        '#^upload/.*\.php(\d|s|ar|t)?$#i',
         // .env.example, .env.testing, etc.
         '#^\.env\..+$#i',
         // Security policy (not secret, but not meant as a route)

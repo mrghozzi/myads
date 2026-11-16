@@ -27,6 +27,8 @@ $blockedPatterns = [
     '#^phpunit\.xml$#',          // PHPUnit config
     '#^\.git(|hub|ignore|attributes|modules)(/|$)#', // Git metadata
     '#^\.editorconfig$#',        // Editor config
+    '#^storage/(logs|framework)(/|$)#', // Sensitive storage directories
+    '#^upload/.*\.php(\d|s|ar|t)?$#',   // PHP files in upload directory
 ];
 
 foreach ($blockedPatterns as $pattern) {
@@ -68,6 +70,29 @@ foreach ([
     if (!is_dir($dir)) {
         @mkdir($dir, 0775, true);
     }
+}
+
+// Fortify upload directory against PHP/CGI execution
+$uploadHtaccess = $baseDir . '/upload/.htaccess';
+if (!file_exists($uploadHtaccess) || filesize($uploadHtaccess) < 50) {
+    if (!is_dir($baseDir . '/upload')) {
+        @mkdir($baseDir . '/upload', 0775, true);
+    }
+    @file_put_contents($uploadHtaccess, "Options -Indexes -ExecCGI\nRemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh\nRemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh\n<IfModule mod_php.c>\n    php_flag engine off\n</IfModule>\n<IfModule mod_php7.c>\n    php_flag engine off\n</IfModule>\n<IfModule mod_php8.c>\n    php_flag engine off\n</IfModule>\n<FilesMatch \"\\.(?i:php|phtml|php3|php4|php5|php7|php8|pht|phar|cgi|pl|py|sh|bash|exe|bat|cmd|vbs|scr|msi|jar|dll|htaccess|htpasswd|ini|env|config)$\">\n    Order Allow,Deny\n    Deny from all\n    <IfModule mod_authz_core.c>\n        Require all denied\n    </IfModule>\n</FilesMatch>\n");
+}
+
+// Fortify storage root, logs, and framework directories against direct web access
+$storageHtaccess = $baseDir . '/storage/.htaccess';
+if (!file_exists($storageHtaccess)) {
+    @file_put_contents($storageHtaccess, "Options -Indexes\n<FilesMatch \"\\.(?i:log|sqlite|sqlite3|db|env|key|pem|crt|json|lock|yml|yaml|php|sh|sql)$\">\n    Order Allow,Deny\n    Deny from all\n    <IfModule mod_authz_core.c>\n        Require all denied\n    </IfModule>\n</FilesMatch>\n");
+}
+$storageLogsHtaccess = $baseDir . '/storage/logs/.htaccess';
+if (!file_exists($storageLogsHtaccess)) {
+    @file_put_contents($storageLogsHtaccess, "Order Allow,Deny\nDeny from all\n<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n");
+}
+$storageFrameworkHtaccess = $baseDir . '/storage/framework/.htaccess';
+if (!file_exists($storageFrameworkHtaccess)) {
+    @file_put_contents($storageFrameworkHtaccess, "Order Allow,Deny\nDeny from all\n<IfModule mod_authz_core.c>\n    Require all denied\n</IfModule>\n");
 }
 
 // Register the Composer autoloader...
