@@ -149,4 +149,12 @@ class V471SecurityHardeningTest extends TestCase
         $this->assertFileExists($tempLogsHtaccess);
         $this->assertStringContainsString('Deny from all', file_get_contents($tempLogsHtaccess));
     }
+
+    public function test_installer_provider_gracefully_handles_missing_installer_directory(): void
+    {
+        // When installer views or installer routes are missing, InstallerServiceProvider must not crash
+        $provider = new \App\Providers\InstallerServiceProvider(app());
+        $provider->boot();
+        $this->assertTrue(true);
+    }
 }

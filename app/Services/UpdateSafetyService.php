@@ -234,7 +234,14 @@ class UpdateSafetyService
             return [];
         }
 
-        $upMethodBody = $this->extractMethodBody(file_get_contents($path) ?: '', 'up');
+        $content = file_get_contents($path) ?: '';
+
+        // Allow intentional destructive operations if explicitly annotated with @allow-destructive
+        if (str_contains($content, '@allow-destructive')) {
+            return [];
+        }
+
+        $upMethodBody = $this->extractMethodBody($content, 'up');
 
         if ($upMethodBody === '') {
             return [];

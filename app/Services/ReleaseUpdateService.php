@@ -475,6 +475,21 @@ class ReleaseUpdateService
             $relativePath = $this->relativePath($inner, $sourcePath);
             $this->assertSafeRelativePath($relativePath);
 
+            $normalizedRelative = str_replace('\\', '/', $relativePath);
+
+            // SECURITY: Never copy the installer directory or developer metadata during release updates on an installed system.
+            if (
+                str_starts_with($normalizedRelative, 'installer/')
+                || $normalizedRelative === 'installer'
+                || str_starts_with($normalizedRelative, '.github/')
+                || str_starts_with($normalizedRelative, 'tests/')
+                || $normalizedRelative === '.gitignore'
+                || $normalizedRelative === '.env'
+                || $normalizedRelative === '.env.example'
+            ) {
+                continue;
+            }
+
             $targetPath = base_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
             $targetDir = dirname($targetPath);
 
@@ -550,6 +565,13 @@ class ReleaseUpdateService
 
         $this->updateStageProgress($session, 'cleanup', 70, __('messages.update_stage_cleanup_removing_temp'), null, null, true);
         $this->deleteTempRoot($session);
+
+        // SECURITY: Remove installer directory if present on installed production site
+        $installerDir = base_path('installer');
+        if (File::isDirectory($installerDir)) {
+            File::deleteDirectory($installerDir);
+            \Log::info('ReleaseUpdate: Cleaned up installer directory on production system for security.');
+        }
 
         $this->updateStageProgress($session, 'cleanup', 90, __('messages.update_stage_cleanup_disabling_maintenance'), null, null, true);
         $this->maintenanceMode->disable($actor, 'admin_update_success');
