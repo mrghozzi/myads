@@ -168,7 +168,7 @@ if (!function_exists('http_secure')) {
     function http_secure(): \Illuminate\Http\Client\PendingRequest
     {
         $http = \Illuminate\Support\Facades\Http::withHeaders([
-            'User-Agent' => 'MyAds/' . (\App\Support\SystemVersion::CURRENT ?? '4.7.0'),
+            'User-Agent' => 'MyAds/' . (\App\Support\SystemVersion::CURRENT ?? '4.7.1'),
         ]);
 
         // SECURITY: Only disable SSL verification in local/testing environments.

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.7.0)
-    'feature_1_title' => 'Enterprise VIP Billing & Revenue Engine',
-    'feature_1_desc' => 'Revolutionized VIP paid memberships with 100% ad-free browsing, configurable PTS multipliers (up to 10x), surf exchange priority surge, 0% store fees, interactive 10-dimension feature comparison matrix, official printable tax invoices (#INV-...), and executive SaaS KPI metrics (ARR, ARPU, conversion rate).',
-    'feature_2_title' => 'Promo Coupons Engine & Free Trial Days',
-    'feature_2_desc' => 'High-conversion promo coupon engine supporting percent and fixed discounts with real-time AJAX validation, zero-cost instant checkout, time-limited plan sale discounts with live countdown timers, 1-click free trial activation, and landing page showcases.',
-    'feature_3_title' => 'Zero-Trust Hardening & Turnstile Bot Defense',
-    'feature_3_desc' => 'Dual DocumentRoot architecture seamlessly supporting public/ or root deployment, strict cryptographic nonce-based Content-Security-Policy (CSP), Cloudflare Turnstile CAPTCHA-free human verification in admin and auth forms, and Webhooks v2 with timestamp replay attack defense.',
-    'feature_4_title' => 'Intelligent AI Support Deflection Engine',
-    'feature_4_desc' => 'Autonomous bilingual deflection service analyzing user inquiries before ticket or support topic submission, performing Arabic text normalization, real-time scanning of 27 Help Center guides and verified solved topics, with instant helpful suggestion cards.',
-    'feature_5_title' => 'Double-Entry Accounting & Point History Suite',
-    'feature_5_desc' => 'Banking-grade double-entry PTS ledger engine with dedicated system contra accounts, zero-balance variance integrity, automated CLI audit (myads:pts:audit), high-performance Eloquent pagination, running balance snapshots, and streaming UTF-8 statement CSV export.',
-    'feature_6_title' => 'Mobile App Bridge & Firebase FCM Notifications',
-    'feature_6_desc' => 'Seamless WebView Bearer token bridge for friction-free authentication, native mobile billing REST API, Flutter subscription badge streaming, and dual-protocol Firebase Cloud Messaging (FCM HTTP v1 and legacy) push notification engine with smart route resolution.',
+    // What's New Section (v4.7.1)
+    'feature_1_title' => 'Deep Binary Inspection & Polyglot Neutralization',
+    'feature_1_desc' => 'Next-generation file security scanning uploaded images for binary magic bytes and embedded executable PHP/ASP payloads (<?php, <?=, UTF-16, __halt_compiler), neutralizing polyglot attacks where malicious code is disguised within valid image files.',
+    'feature_2_title' => 'Universal Upload Controllers Hardening',
+    'feature_2_desc' => 'Fortified upload handling across feed status, rich text editor images, forum topics and attachments, groups, and store screenshots with cryptographic random filenames and strict server-side MIME deduction.',
+    'feature_3_title' => 'Self-Healing Directory Shields (.htaccess)',
+    'feature_3_desc' => 'Multi-layered protection with tracked .htaccess files disabling directory execution, script handlers, and PHP engine in upload/ and storage/. Features an automatic self-healing engine restoring deleted shields on the fly.',
+    'feature_4_title' => 'Pre-Boot Request URI Shielding',
+    'feature_4_desc' => 'Immediate pre-boot HTTP 403 blocking in index.php and BlockSensitivePaths middleware, instantly halting requests to storage/logs, storage/framework, and executable scripts in upload/ before framework execution.',
+    'feature_5_title' => 'Installer Isolation & Automated Clean-up',
+    'feature_5_desc' => 'Post-install security hardening ensuring the installer/ directory is excluded during release updates, cleaned up automatically upon upgrade completion, and gracefully ignored by service providers without runtime crashes.',
+    'feature_6_title' => 'Update Safety & Preflight Inspection',
+    'feature_6_desc' => 'Enhanced update safety service with preflight database checks, migration safety inspection, and support for @allow-destructive annotations on intentional, planned schema cleanups.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

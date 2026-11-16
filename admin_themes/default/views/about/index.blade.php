@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.7.0 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.7.1 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Emergency Platform Security Hardening, Multi-Layered Web Shell &amp; Arbitrary File Upload Defense, Deep Binary Inspection &amp; Polyglot Neutralization, Self-Healing Directory Shields, Pre-Boot Request URI Blocking, Installer Sandbox Isolation &amp; Auto-Cleanup, and Update Safety Migration Preflight Engine.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Deep Inspection</span>
+                                            <span class="text-muted fs-13">Multi-stage deep binary inspection (<code>FileUploadSecurityService</code>) validating file magic bytes and scanning for embedded executable PHP/ASP payloads (<code>&lt;?php</code>, <code>&lt;?=</code>, UTF-16 encodings, <code>__halt_compiler()</code>), neutralizing polyglot Web Shell attacks disguised as valid images.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Upload Fortification</span>
+                                            <span class="text-muted fs-13">Universal hardening across all file upload points (feed status, Quill.js rich text editor, forum topics and attachments, groups, and store screenshots) with cryptographic random filenames and strict server-side MIME deduction.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Self-Healing Shields</span>
+                                            <span class="text-muted fs-13">Tracked multi-layered <code>.htaccess</code> shields disabling PHP engine and script execution in <code>upload/</code> and <code>storage/</code>, backed by an automated runtime self-healing engine in <code>index.php</code> and <code>AppServiceProvider</code> that regenerates deleted shields instantly.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Pre-Boot Interception</span>
+                                            <span class="text-muted fs-13">Ultra-fast pre-boot request URI filtering in <code>index.php</code> and <code>BlockSensitivePaths</code> middleware, returning immediate HTTP 403 Forbidden on direct requests to <code>/storage/logs/*</code>, <code>/storage/framework/*</code>, or PHP scripts in <code>/upload/*</code> before framework boot.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1">Installer Sandbox</span>
+                                            <span class="text-muted fs-13">Post-installation security fortification: <code>ReleaseUpdateService</code> strictly excludes <code>installer/</code> during release updates and deletes it upon completion; <code>InstallerServiceProvider</code> gracefully skips missing installer files without fatal stream errors.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Update Safety</span>
+                                            <span class="text-muted fs-13">Enhanced preflight update inspection (<code>UpdateSafetyService</code>) supporting <code>@allow-destructive</code> annotations on intentional schema cleanup migrations, preventing accidental data loss while allowing planned table drops.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.7.0 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Zero-Trust Security Hardening, AI Support Deflection Engine, Webhook Replay Attack Protection v2, Strict Nonce-Based CSP, Cloudflare Turnstile Bot Defense, Limitless &amp; Secure Plugin Architecture Overhaul, Enterprise VIP Billing &amp; Revenue Engine Modernization, Promo Coupons &amp; Free Trials, Mobile App &amp; WebView Token Bridge, Double-Entry PTS Ledger Engine, Point History Statement Overhaul &amp; CSV Export, Dual DocumentRoot Architecture, and FCM Push Notification Parity.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

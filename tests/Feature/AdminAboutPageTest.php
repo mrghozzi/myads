@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Enterprise VIP Billing & Revenue Engine')
-            ->assertSee('Promo Coupons Engine & Free Trial Days')
-            ->assertSee('Zero-Trust Hardening & Turnstile Bot Defense')
+            ->assertSee('Deep Binary Inspection & Polyglot Neutralization')
+            ->assertSee('Universal Upload Controllers Hardening')
+            ->assertSee('Self-Healing Directory Shields (.htaccess)')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('محرك الاشتراكات المميزة VIP ومنظومة الفوترة المتطورة')
-            ->assertSee('محرك قسائم التخفيض والعروض والفترات التجريبية المجانية')
-            ->assertSee('حماية انعدام الثقة (Zero-Trust) ومكافحة البوتات Turnstile')
+            ->assertSee('الفحص الثنائي العميق وتحييد هجمات Polyglot')
+            ->assertSee('تحصين شامل لكافة منافذ رفع الملفات')
+            ->assertSee('دروع الحماية الذاتية والتعافي التلقائي (.htaccess)')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

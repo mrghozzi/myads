@@ -163,7 +163,7 @@ class WebhookDispatcherService
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
-                    'User-Agent' => 'MYADS-Webhook/4.7.0',
+                    'User-Agent' => 'MYADS-Webhook/' . \App\Support\SystemVersion::CURRENT,
                     'X-MYADS-Timestamp' => (string) $timestamp,
                     'X-MYADS-Signature' => $signatureV2,
                     'X-MYADS-Signature-256' => $signatureV1,

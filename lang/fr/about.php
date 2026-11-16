@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-    // What's New Section (v4.7.0)
-    'feature_1_title' => 'Facturation VIP & Moteur de Revenus Enterprise',
-    'feature_1_desc' => 'Adhésions VIP avec navigation 100% sans publicité, multiplicateurs de points PTS (jusqu\'à 10x), priorité dans l\'échange de visites, commissions boutique à 0%, matrice comparative de fonctionnalités, factures fiscales imprimables (#INV-...) et indicateurs SaaS (ARR, ARPU).',
-    'feature_2_title' => 'Moteur de Coupons Promo & Essais Gratuits',
-    'feature_2_desc' => 'Système de coupons de réduction en pourcentage ou montant fixe avec validation AJAX instantanée, commandes à 0€ immédiates, réductions de prix temporaires avec compte à rebours en direct et activation d\'essais gratuits en 1 clic.',
-    'feature_3_title' => 'Sécurité Zero-Trust & Protection Turnstile',
-    'feature_3_desc' => 'Architecture DocumentRoot double (public/ ou racine), politique de sécurité du contenu (CSP) stricte basée sur des nonces cryptographiques, vérification humaine Cloudflare Turnstile sans CAPTCHA et Webhooks v2 avec horodatage anti-rejeu.',
-    'feature_4_title' => 'Moteur de Déflexion IA pour le Support',
-    'feature_4_desc' => 'Service de déflexion intelligent et bilingue analysant les demandes d\'assistance avant soumission de tickets, normalisation du texte, recherche en temps réel dans les 27 guides du centre d\'aide et suggestions instantanées.',
-    'feature_5_title' => 'Grand Livre PTS en Partie Double & Historique',
-    'feature_5_desc' => 'Moteur comptable de partie double avec comptes de contrepartie système dédiés, intégrité mathématique absolue, commande d\'audit CLI (myads:pts:audit), pagination SQL ultra-rapide, solde progressif et export CSV en streaming UTF-8.',
-    'feature_6_title' => 'Passerelle Mobile & Notifications Push FCM',
-    'feature_6_desc' => 'Passerelle de jeton Bearer pour WebView, API REST de facturation mobile native, synchronisation des badges d\'abonnement dans Flutter et moteur de notifications push Firebase Cloud Messaging (FCM HTTP v1 et legacy).',
+    // What's New Section (v4.7.1)
+    'feature_1_title' => 'Inspection Binaire Profonde & Neutralisation Polyglote',
+    'feature_1_desc' => 'Sécurité de pointe scannant les octets magiques des images et les charges utiles PHP/ASP injectées (<?php, <?=, UTF-16, __halt_compiler), neutralisant les attaques polyglotes dissimulées dans les images.',
+    'feature_2_title' => 'Sécurisation Universelle des Téléversements',
+    'feature_2_desc' => 'Renforcement de tous les contrôleurs de téléversement (flux, éditeur riche, forum, pièces jointes, groupes, captures boutique) avec noms chiffrés et déduction stricte des extensions via MIME côté serveur.',
+    'feature_3_title' => 'Boucliers de Répertoire Auto-Régénérants (.htaccess)',
+    'feature_3_desc' => 'Protection multicouche avec fichiers .htaccess interdisant l\'exécution de scripts PHP dans upload/ et storage/, dotée d\'un moteur d\'auto-guérison régénérant instantanément les boucliers manquants.',
+    'feature_4_title' => 'Blocage Pré-Démarrage des URI Sensibles',
+    'feature_4_desc' => 'Interception immédiate HTTP 403 dans index.php et le middleware de sécurité, bloquant tout accès direct à storage/logs, storage/framework et aux scripts dans upload/ avant le démarrage du framework.',
+    'feature_5_title' => 'Isolation & Nettoyage Automatique de l\'Installeur',
+    'feature_5_desc' => 'Exclusion stricte du répertoire installer/ lors des mises à jour, suppression automatique après mise à niveau et tolérance gracieuse du fournisseur de services sans plantage applicatif.',
+    'feature_6_title' => 'Sécurité des Mises à Jour & Contrôle Pré-Vol',
+    'feature_6_desc' => 'Vérification pré-vol de la base de données et des migrations avant mise à jour, avec prise en charge de l\'annotation @allow-destructive pour les nettoyages de schémas planifiés.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',
