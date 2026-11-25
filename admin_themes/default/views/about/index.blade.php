@@ -490,8 +490,35 @@
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-4">
                             <div class="timeline">
                                 <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-shield fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.7.2 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Core Security Hardening, Canonical Path-Containment, Arbitrary File Deletion &amp; Disclosure Remediation, Zip Slip &amp; Symlink Defense, Centralized SSRF Protection, Stored XSS Sanitization, Complete Upload Handler Parity, and Pre-Boot Anti-Reset Safeguards.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Path Containment</span>
+                                            <span class="text-muted fs-13">Enforced canonical <code>realpath()</code> containment (<code>safeDeleteFile()</code>, <code>resolveSafeExistingFile()</code>, <code>resolveSafeChildDirectory()</code>) across forum attachments, gallery assets, store archives, admin languages, orders, and billing receipts.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">SSRF Defense</span>
+                                            <span class="text-muted fs-13">Added centralized <code>OutboundUrlSecurityService</code> blocking internal/loopback/metadata IPs, obfuscated IP encodings, and unsafe redirects across <code>SeoCheckerService</code>, <code>SmartAdAnalyzer</code>, and extension downloaders.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Zip Slip Guard</span>
+                                            <span class="text-muted fs-13">Added <code>FileUploadSecurityService::extractSafeZip()</code> rejecting traversal entries and Unix symlinks across <code>PluginManager</code>, <code>ThemeManager</code>, <code>ExtensionPackageUpgrader</code>, and <code>ReleaseUpdateService</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">XSS Sanitization</span>
+                                            <span class="text-muted fs-13">Added <code>HtmlSanitizer</code> for <code>ContentFormatter::formatForum()</code>, stripped raw HTML in Store Markdown, removed SVG support from banner &amp; maintenance logo uploads, and hardened admin media uploads.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1">Boot Safeguards</span>
+                                            <span class="text-muted fs-13">Blocked <code>.phtml</code>/<code>.phar</code>/<code>.php8</code> under <code>/upload/*</code>, prevented <code>index.php</code> from unlinking <code>storage/installed</code> on installed sites, and made <code>InstallerGuard</code> fail closed during DB outages.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.7.1 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.7.1 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Emergency Platform Security Hardening, Multi-Layered Web Shell &amp; Arbitrary File Upload Defense, Deep Binary Inspection &amp; Polyglot Neutralization, Self-Healing Directory Shields, Pre-Boot Request URI Blocking, Installer Sandbox Isolation &amp; Auto-Cleanup, and Update Safety Migration Preflight Engine.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
