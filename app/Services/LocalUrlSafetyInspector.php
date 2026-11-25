@@ -54,11 +54,17 @@ class LocalUrlSafetyInspector implements UrlSafetyInspectorInterface
             return 'invalid_host';
         }
 
-        if ($host === 'localhost' || str_ends_with($host, '.localhost')) {
+        if (
+            $host === 'localhost'
+            || str_ends_with($host, '.localhost')
+            || str_ends_with($host, '.local')
+            || str_ends_with($host, '.internal')
+            || str_ends_with($host, '.localdomain')
+        ) {
             return 'localhost_not_allowed';
         }
 
-        if (filter_var($host, FILTER_VALIDATE_IP) && !$this->isPublicIp($host)) {
+        if ($this->isIpOrEncodedPrivateAddress($host)) {
             return 'private_ip_not_allowed';
         }
 
@@ -93,13 +99,14 @@ class LocalUrlSafetyInspector implements UrlSafetyInspectorInterface
     private function normalizeHost(string $host): string
     {
         $host = trim(mb_strtolower($host, 'UTF-8'));
+        $host = trim($host, "[] \t\n\r\0\x0B");
 
         if ($host === '') {
             return '';
         }
 
-        if (function_exists('idn_to_ascii')) {
-            $ascii = idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+        if (function_exists('idn_to_ascii') && !str_contains($host, ':')) {
+            $ascii = @idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
             if (is_string($ascii) && $ascii !== '') {
                 $host = mb_strtolower($ascii, 'UTF-8');
             }
@@ -108,12 +115,16 @@ class LocalUrlSafetyInspector implements UrlSafetyInspectorInterface
         return trim($host, '.');
     }
 
+    private function isIpOrEncodedPrivateAddress(string $host): bool
+    {
+        $outbound = app(\App\Services\Security\OutboundUrlSecurityService::class);
+        $ip = $outbound->extractLiteralIp($host);
+
+        return $ip !== null && !$outbound->isPublicIp($ip);
+    }
+
     private function isPublicIp(string $ip): bool
     {
-        return filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
-        ) !== false;
+        return app(\App\Services\Security\OutboundUrlSecurityService::class)->isPublicIp($ip);
     }
 }

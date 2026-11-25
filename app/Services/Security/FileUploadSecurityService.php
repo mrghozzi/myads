@@ -822,6 +822,75 @@ class FileUploadSecurityService
         return null;
     }
 
+    /**
+     * Validate all entries in an opened ZIP archive against Zip Slip traversal and symlink entries.
+     *
+     * @return string|null Error message if an unsafe entry is detected, or null when safe
+     */
+    public function inspectZipArchive(ZipArchive $zip, int $maxEntries = 5000): ?string
+    {
+        if ($zip->numFiles > $maxEntries) {
+            return 'Archive exceeds maximum allowed entry count.';
+        }
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entryName = (string) $zip->getNameIndex($i);
+            $normalized = str_replace('\\', '/', $entryName);
+
+            if (
+                $normalized === ''
+                || str_contains($normalized, "\0")
+                || str_starts_with($normalized, '/')
+                || preg_match('/^[A-Za-z]:\//', $normalized) === 1
+                || in_array('..', explode('/', trim($normalized, '/')), true)
+            ) {
+                return "Unsafe archive entry detected: {$entryName}";
+            }
+
+            if (method_exists($zip, 'getExternalAttributesIndex')) {
+                $opsys = 0;
+                $attr = 0;
+                if ($zip->getExternalAttributesIndex($i, $opsys, $attr) && $opsys === ZipArchive::OPSYS_UNIX) {
+                    $fileType = ($attr >> 16) & 0170000;
+                    if ($fileType === 0120000) {
+                        return "Unsafe symbolic link entry detected in archive: {$entryName}";
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Safely extract a ZIP archive after inspecting every entry for Zip Slip traversal and symlinks.
+     *
+     * @throws \RuntimeException When the archive cannot be opened or contains unsafe entries
+     */
+    public function extractSafeZip(string $zipPath, string $destinationPath, int $maxEntries = 5000): bool
+    {
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath) !== true) {
+            return false;
+        }
+
+        try {
+            $unsafeError = $this->inspectZipArchive($zip, $maxEntries);
+            if ($unsafeError !== null) {
+                Log::critical('Security Alert: ' . $unsafeError);
+                throw new \RuntimeException($unsafeError);
+            }
+
+            if (!is_dir($destinationPath) && !@mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+                throw new \RuntimeException('Failed to create extraction directory.');
+            }
+
+            return $zip->extractTo($destinationPath);
+        } finally {
+            $zip->close();
+        }
+    }
+
     private function containsTraversalSegment(string $normalizedPath): bool
     {
         foreach (explode('/', $normalizedPath) as $segment) {

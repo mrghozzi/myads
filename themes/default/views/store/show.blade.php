@@ -401,7 +401,7 @@
                         @endif
 
                         {{-- Read-only view --}}
-                        <div id="store-topic-display" class="store-rich-text markdown-content" data-rendered="true" itemprop="description">{!! \Illuminate\Support\Str::markdown($topic?->txt ?? $product->o_valuer ?? '') !!}</div>
+                        <div id="store-topic-display" class="store-rich-text markdown-content" data-rendered="true" itemprop="description">{!! \Illuminate\Support\Str::markdown($topic?->txt ?? $product->o_valuer ?? '', ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}</div>
 
                         {{-- Editor (hidden by default) --}}
                         @if($canManageProduct)
@@ -629,7 +629,7 @@
                                                 </center>
                                             </td>
                                             @if($canManageProduct)
-                                                <td class="markdown-content">{!! $file->o_valuer !!}</td>
+                                                <td class="markdown-content">{!! \App\Support\ContentFormatter::format((string) $file->o_valuer) !!}</td>
                                             @endif
                                         </tr>
                                     @empty

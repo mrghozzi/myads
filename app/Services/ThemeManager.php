@@ -236,11 +236,8 @@ class ThemeManager
 
         $tempExtractPath = storage_path('app/temp_themes/' . uniqid());
         try {
-            $zip = new ZipArchive;
-            if ($zip->open($filePath) === TRUE) {
-                $zip->extractTo($tempExtractPath);
-                $zip->close();
-
+            $security = app(\App\Services\Security\FileUploadSecurityService::class);
+            if ($security->extractSafeZip($filePath, $tempExtractPath)) {
                 // Find root folder containing theme.json
                 $rootFolder = $tempExtractPath;
                 if (!File::exists($tempExtractPath . '/theme.json')) {
@@ -277,6 +274,8 @@ class ThemeManager
                 return true;
             }
             return __('messages.theme_zip_open_failed');
+        } catch (\RuntimeException $e) {
+            return $e->getMessage();
         } finally {
             if (File::exists($tempExtractPath)) {
                 File::deleteDirectory($tempExtractPath);

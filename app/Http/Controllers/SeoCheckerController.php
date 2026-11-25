@@ -27,10 +27,20 @@ class SeoCheckerController extends Controller
             'url' => 'required|url'
         ]);
 
-        $url = $request->input('url');
-        
-        // Analyze URL
-        $results = $seoCheckerService->analyzeUrl($url);
+        $url = (string) $request->input('url');
+
+        // Analyze URL safely (rejects internal/private SSRF targets)
+        try {
+            $results = $seoCheckerService->analyzeUrl($url);
+        } catch (\InvalidArgumentException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], 422);
+            }
+
+            return redirect()->back()
+                ->withErrors(['url' => $e->getMessage()])
+                ->withInput();
+        }
 
         // Fetch settings for permissions
         $option = Option::where('name', 'seo_checker_settings')->first();

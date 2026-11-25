@@ -416,6 +416,59 @@ class GroqAdstnPublisherTest extends TestCase
         $this->assertStringContainsString('/store/my-purchases', $response->json('answer'));
     }
 
+    public function test_tickets_quick_help_requires_authentication_and_ticket_ownership(): void
+    {
+        $owner = User::factory()->create(['username' => 'ticket_owner']);
+        $otherUser = User::factory()->create(['username' => 'other_member']);
+
+        Option::updateOrCreate(
+            ['name' => 'groq-adstn-publisher', 'o_type' => 'plugins'],
+            ['o_valuer' => 1]
+        );
+
+        $service = new GroqAdstnPublisherService();
+        $service->saveConfig([
+            'is_enabled' => 1,
+            'api_key' => 'mock_key',
+            'tickets_enabled' => 1,
+            'tickets_user_widget' => 1,
+        ]);
+
+        $ticket = SupportTicket::create([
+            'ticket_number' => 'TCK-PRIV-001',
+            'user_id' => $owner->id,
+            'department' => 'technical',
+            'priority' => 'high',
+            'status' => 'open',
+            'subject' => 'Private billing secret inquiry',
+            'last_reply_at' => now(),
+            'last_reply_by' => $owner->id,
+        ]);
+
+        // Unauthenticated guest must be denied
+        $this->postJson('/api/groq-adstn-publisher/tickets/quick-help', ['ticket_id' => $ticket->id])
+            ->assertStatus(401);
+
+        // Non-owner member must be denied (IDOR blocked)
+        $this->actingAs($otherUser)
+            ->postJson('/api/groq-adstn-publisher/tickets/quick-help', ['ticket_id' => $ticket->id])
+            ->assertStatus(403);
+
+        Http::fake([
+            'api.groq.com/*' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => '- Step 1: Clear browser cache.']]
+                ]
+            ], 200)
+        ]);
+
+        // Ticket owner succeeds
+        $this->actingAs($owner)
+            ->postJson('/api/groq-adstn-publisher/tickets/quick-help', ['ticket_id' => $ticket->id])
+            ->assertOk()
+            ->assertJson(['success' => true]);
+    }
+
     public function test_platform_knowledge_service_includes_modules_and_custom_rules(): void
     {
         $service = new PlatformKnowledgeService();

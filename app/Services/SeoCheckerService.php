@@ -2,16 +2,29 @@
 
 namespace App\Services;
 
+use App\Services\Security\OutboundUrlSecurityService;
+
 class SeoCheckerService
 {
+    public function __construct(
+        private readonly ?OutboundUrlSecurityService $urlSecurity = null
+    ) {
+    }
+
     /**
      * Perform the SEO analysis on the given URL.
-     * 
+     *
      * @param string $url
      * @return array
      */
     public function analyzeUrl(string $url): array
     {
+        $security = $this->urlSecurity ?? app(OutboundUrlSecurityService::class);
+        $validation = $security->validateUrl($url, true);
+        if (!$validation['valid']) {
+            throw new \InvalidArgumentException($validation['error'] ?: 'Unsafe target URL.');
+        }
+
         $startTime = microtime(true);
         $html = $this->fetchHtml($url);
         $endTime = microtime(true);
@@ -59,23 +72,22 @@ class SeoCheckerService
     }
 
     /**
-     * Fetch the HTML content using cURL.
+     * Fetch HTML safely with SSRF protection and hop-by-hop redirect validation.
      */
     private function fetchHtml(string $url): ?string
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'MYADS-SEO-Checker/1.0');
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        
-        $html = curl_exec($ch);
-        curl_close($ch);
-        
-        return $html !== false ? $html : null;
+        $security = $this->urlSecurity ?? app(OutboundUrlSecurityService::class);
+        $result = $security->safeRequest(
+            $url,
+            ['User-Agent' => 'MYADS-SEO-Checker/1.0'],
+            10,
+            3,
+            2097152,
+            'GET',
+            true
+        );
+
+        return $result['ok'] && $result['body'] !== '' ? $result['body'] : null;
     }
 
     /**

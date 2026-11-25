@@ -68,7 +68,12 @@ class ExtensionManifestReader
      */
     private function downloadRemoteZip(string $source): ?array
     {
-        $response = Http::withHeaders([
+        $urlCheck = app(\App\Services\Security\OutboundUrlSecurityService::class)->validateUrl($source, true);
+        if (! $urlCheck['valid']) {
+            return null;
+        }
+
+        $response = http_secure()->withHeaders([
             'User-Agent' => 'MyAds-Extension-Marketplace',
         ])->timeout(20)->get($source);
 

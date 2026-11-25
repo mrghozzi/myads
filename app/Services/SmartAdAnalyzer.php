@@ -2,25 +2,39 @@
 
 namespace App\Services;
 
+use App\Services\Security\OutboundUrlSecurityService;
 use App\Support\SmartAdTargeting;
-use Illuminate\Support\Facades\Http;
 
 class SmartAdAnalyzer
 {
     private const URL_LIMIT = 2048;
 
+    public function __construct(
+        private readonly ?OutboundUrlSecurityService $urlSecurity = null
+    ) {
+    }
+
     public function analyze(string $url): array
     {
-        $response = Http::withHeaders([
-            'User-Agent' => 'MyAds-SmartAds/1.0',
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        ])->timeout(10)->get($url);
+        $security = $this->urlSecurity ?? app(OutboundUrlSecurityService::class);
+        $result = $security->safeRequest(
+            $url,
+            [
+                'User-Agent' => 'MyAds-SmartAds/1.0',
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            ],
+            10,
+            3,
+            2097152,
+            'GET',
+            true
+        );
 
-        if (!$response->successful()) {
+        if (!$result['ok']) {
             throw new \RuntimeException('Unable to analyze the destination page.');
         }
 
-        $html = $this->normalizeHtmlToUtf8((string) $response->body(), $response->header('Content-Type'));
+        $html = $this->normalizeHtmlToUtf8($result['body'], $result['content_type']);
         $document = new \DOMDocument();
         $internalErrors = libxml_use_internal_errors(true);
         @$document->loadHTML('<?xml encoding="UTF-8">' . $html);

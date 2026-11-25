@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Security;
 
+use App\Models\Banner;
 use App\Models\ForumAttachment;
 use App\Models\ForumTopic;
+use App\Models\Link;
 use App\Models\Message;
 use App\Models\Option;
 use App\Models\OrderRequest;
@@ -15,11 +17,18 @@ use App\Models\Status;
 use App\Models\User;
 use App\Services\AdminAccessService;
 use App\Services\GroupMembershipService;
+use App\Services\LocalUrlSafetyInspector;
+use App\Services\PluginManager;
 use App\Services\Security\FileUploadSecurityService;
+use App\Services\Security\OutboundUrlSecurityService;
+use App\Services\SmartAdAnalyzer;
+use App\Services\ThemeManager;
+use App\Support\ContentFormatter;
 use App\Support\SystemVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use Tests\Concerns\SeedsSiteSettings;
 use Tests\TestCase;
@@ -427,6 +436,280 @@ class V472SecurityHardeningTest extends TestCase
             $content = file_get_contents($entryFile);
             $this->assertStringContainsString("!file_exists(\$baseDir . '/storage/installed')", $content);
             $this->assertStringNotContainsString("@unlink(\$baseDir . '/storage/installed')", $content);
+        }
+    }
+
+    public function test_ssrf_protection_blocks_internal_targets_and_redirects_across_services(): void
+    {
+        $outboundSecurity = app(OutboundUrlSecurityService::class);
+        $inspector = app(LocalUrlSafetyInspector::class);
+
+        $blockedTargets = [
+            'http://127.0.0.1/admin',
+            'http://[::1]/secret',
+            'http://[::ffff:127.0.0.1]/secret',
+            'http://169.254.169.254/latest/meta-data/',
+            'http://10.0.0.5/internal',
+            'http://192.168.1.10/router',
+            'http://0x7f000001/',
+            'http://localhost/health',
+            'http://service.internal/api',
+            'file:///etc/passwd',
+        ];
+
+        foreach ($blockedTargets as $blockedUrl) {
+            $result = $outboundSecurity->validateUrl($blockedUrl, true);
+            $this->assertFalse($result['valid'], "OutboundUrlSecurityService must reject {$blockedUrl}");
+        }
+
+        // LocalUrlSafetyInspector must block bracketed IPv6 loopback, mapped IPv6, and .internal domains
+        $this->assertNotNull($inspector->firstViolation('http://[::1]/'));
+        $this->assertNotNull($inspector->firstViolation('http://[::ffff:127.0.0.1]/'));
+        $this->assertNotNull($inspector->firstViolation('http://metadata.internal/'));
+
+        // Hop-by-hop redirect SSRF protection across OutboundUrlSecurityService and SmartAdAnalyzer
+        Http::fake([
+            'https://redirector.test/*' => Http::response('', 302, ['Location' => 'http://127.0.0.1/admin']),
+        ]);
+
+        $redirectFetch = $outboundSecurity->safeRequest('https://redirector.test/start', [], 5, 3, 102400, 'GET', true);
+        $this->assertFalse($redirectFetch['ok']);
+
+        $this->expectException(\RuntimeException::class);
+        app(SmartAdAnalyzer::class)->analyze('https://redirector.test/start');
+    }
+
+    public function test_seo_checker_rejects_ssrf_targets(): void
+    {
+        $response = $this->post(route('seo_checker.analyze'), [
+            'url' => 'http://169.254.169.254/latest/meta-data/',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['url']);
+    }
+
+    public function test_zip_slip_and_symlink_entries_are_rejected_before_extraction(): void
+    {
+        $tempDir = storage_path('app/__v472_zip_test_' . uniqid());
+        File::makeDirectory($tempDir, 0755, true);
+        $this->cleanupPaths[] = $tempDir;
+
+        $escapeFile = storage_path('__v472_escaped_canary.txt');
+        $this->cleanupPaths[] = $escapeFile;
+
+        // 1. Traversal Zip Slip payload in plugin archive
+        $zipSlipPath = $tempDir . '/evil_plugin.zip';
+        $zip = new ZipArchive();
+        $this->assertTrue($zip->open($zipSlipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true);
+        $zip->addFromString('plugin.json', json_encode([
+            'name' => 'Evil Plugin',
+            'slug' => 'evil-zip-plugin-' . uniqid(),
+            'version' => '1.0.0',
+            'author' => 'tester',
+        ]));
+        $zip->addFromString('../../../../' . basename($escapeFile), 'ESCAPED');
+        $zip->close();
+
+        $extractTarget = $tempDir . '/extract_out';
+        $threwZipSlip = false;
+        try {
+            $this->securityService->extractSafeZip($zipSlipPath, $extractTarget);
+        } catch (\RuntimeException) {
+            $threwZipSlip = true;
+        }
+        $this->assertTrue($threwZipSlip, 'extractSafeZip must reject traversal ZIP entries.');
+        $this->assertFileDoesNotExist($escapeFile);
+
+        // PluginManager & ThemeManager must both reject unsafe extraction entries
+        $uploadedPluginZip = new UploadedFile($zipSlipPath, 'evil_plugin.zip', 'application/zip', null, true);
+        $pluginResult = app(PluginManager::class)->install($uploadedPluginZip);
+        $this->assertIsString($pluginResult);
+        $this->assertFileDoesNotExist($escapeFile);
+
+        // 2. Unix symlink entry inside ZIP archive
+        $symlinkZipPath = $tempDir . '/symlink.zip';
+        $symZip = new ZipArchive();
+        $this->assertTrue($symZip->open($symlinkZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true);
+        $symZip->addFromString('secret_link', '/etc/passwd');
+        if (method_exists($symZip, 'setExternalAttributesIndex')) {
+            $symZip->setExternalAttributesIndex(0, ZipArchive::OPSYS_UNIX, (0120777 << 16));
+        }
+        $symZip->close();
+
+        if (method_exists(ZipArchive::class, 'getExternalAttributesIndex')) {
+            $threwSymlink = false;
+            try {
+                $this->securityService->extractSafeZip($symlinkZipPath, $tempDir . '/sym_out');
+            } catch (\RuntimeException) {
+                $threwSymlink = true;
+            }
+            $this->assertTrue($threwSymlink, 'extractSafeZip must reject Unix symlink entries.');
+        }
+
+        // ThemeManager Zip Slip check
+        $themeSlipPath = $tempDir . '/evil_theme.zip';
+        $themeZip = new ZipArchive();
+        $this->assertTrue($themeZip->open($themeSlipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true);
+        $themeZip->addFromString('theme.json', json_encode([
+            'name' => 'Evil Theme',
+            'slug' => 'evil-zip-theme-' . uniqid(),
+            'version' => '1.0.0',
+            'author' => 'tester',
+        ]));
+        $themeZip->addFromString('../../../' . basename($escapeFile), 'ESCAPED_THEME');
+        $themeZip->close();
+
+        $themeResult = app(ThemeManager::class)->install($themeSlipPath);
+        $this->assertIsString($themeResult);
+        $this->assertFileDoesNotExist($escapeFile);
+    }
+
+    public function test_forum_store_and_ad_xss_payloads_are_sanitized(): void
+    {
+        $xssForumInput = '<p>Hello <b>MYADS</b> بالعربية</p>'
+            . '<script>alert("xss1")</script>'
+            . '<img src="https://example.com/photo.png" onerror="alert(2)">'
+            . '<a href="javascript:alert(3)" target="_blank">Bad Link</a>'
+            . '<iframe src="https://evil.example/embed"></iframe>'
+            . "\n\n[YouTube](https://www.youtube.com/watch?v=dQw4w9WgXcQ)";
+
+        $formatted = ContentFormatter::formatForum($xssForumInput);
+        $this->assertStringContainsString('<b>MYADS</b>', $formatted);
+        $this->assertStringContainsString('بالعربية', $formatted);
+        $this->assertStringNotContainsString('<script', strtolower($formatted));
+        $this->assertStringNotContainsString('onerror', strtolower($formatted));
+        $this->assertStringNotContainsString('javascript:', strtolower($formatted));
+        $this->assertStringNotContainsString('<iframe src="https://evil.example', strtolower($formatted));
+        $this->assertStringContainsString('https://www.youtube.com/embed/dQw4w9WgXcQ', $formatted);
+
+        $sanitizedRaw = \App\Support\HtmlSanitizer::sanitize('<p>Safe</p><iframe src="https://evil.example/embed"></iframe><svg onload="alert(1)"></svg>');
+        $this->assertStringContainsString('<p>Safe</p>', $sanitizedRaw);
+        $this->assertStringNotContainsString('evil.example', $sanitizedRaw);
+        $this->assertStringNotContainsString('<svg', strtolower($sanitizedRaw));
+
+        // Verify bootstrap-sample ads/links/visits & store views neutralize script/XSS payloads
+        Option::updateOrCreate(['o_type' => 'store_type', 'name' => 'scripts'], ['o_valuer' => 'Scripts']);
+        $category = Option::where('o_type', 'store_type')->first();
+
+        $product = Product::create([
+            'name' => 'XSS-Test-Product',
+            'o_valuer' => 'Desc <script>alert("md")</script>',
+            'o_parent' => $this->user->id,
+            'o_order' => 0,
+            'o_mode' => $category->id,
+            'o_type' => 'store',
+        ]);
+
+        Status::create([
+            'uid' => $this->user->id,
+            'tp_id' => $product->id,
+            's_type' => 7867,
+            'statu' => 1,
+            'date' => time(),
+        ]);
+
+        ProductFile::create([
+            'name' => 'v1.0',
+            'o_parent' => $product->id,
+            'o_valuer' => '<script>alert("file_xss")</script>Release notes',
+            'o_mode' => 'store_files/dummy.zip',
+            'o_type' => 'store_file',
+        ]);
+
+        // Test default store view changelog formatting as product owner
+        $storeRes = $this->actingAs($this->user)->get(route('store.show', $product->name));
+        $storeRes->assertOk();
+        $storeRes->assertDontSee('<script>alert("md")</script>', false);
+        $storeRes->assertDontSee('<script>alert("file_xss")</script>', false);
+
+        // Verify bootstrap-sample banner/link index views escape XSS in names
+        Banner::create([
+            'uid' => $this->user->id,
+            'name' => '<script>alert("banner")</script>',
+            'url' => 'https://example.com',
+            'img' => 'https://example.com/b.png',
+            'px' => '468x60',
+            'vu' => 10,
+            'statu' => 1,
+        ]);
+
+        \App\Providers\ThemeServiceProvider::applyTheme('bootstrap-sample');
+        $bannersRes = $this->actingAs($this->user)->get(route('ads.banners.index'));
+        $bannersRes->assertOk();
+        $bannersRes->assertDontSee('<script>alert("banner")</script>', false);
+        $bannersRes->assertSee('&lt;script&gt;', false);
+        \App\Providers\ThemeServiceProvider::applyTheme('default');
+    }
+
+    public function test_maintenance_logo_rejects_svg_and_ffmpeg_rejects_arbitrary_binary(): void
+    {
+        $svgLogo = UploadedFile::fake()->createWithContent('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+        $resSvg = $this->actingAs($this->admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->post(route('admin.maintenance.settings.update'), [
+                'maintenance_enabled' => '0',
+                'maintenance_logo' => $svgLogo,
+            ]);
+        $resSvg->assertSessionHasErrors(['maintenance_logo']);
+
+        $polyglotLogo = UploadedFile::fake()->createWithContent('evil.png', "\x89PNG\r\n\x1a\n<?php echo 'test'; ?>");
+        $resPoly = $this->actingAs($this->admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->post(route('admin.maintenance.settings.update'), [
+                'maintenance_enabled' => '0',
+                'maintenance_logo' => $polyglotLogo,
+            ]);
+        $resPoly->assertSessionHasErrors(['maintenance_logo']);
+
+        $ffmpegRes = $this->actingAs($this->admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->postJson(route('admin.settings.ffmpeg.debug'), [
+                'binary_path' => '/bin/sh',
+            ]);
+        $ffmpegRes->assertStatus(400)
+            ->assertJson(['success' => false, 'error_type' => 'invalid_binary']);
+    }
+
+    public function test_hardened_plugins_block_ssrf_traversal_and_unsafe_assets(): void
+    {
+        // 1. Link Checker SSRF rejection
+        Option::updateOrCreate(['name' => 'link-checker', 'o_type' => 'plugins'], ['o_valuer' => 1]);
+        if (file_exists(base_path('plugins/link-checker/boot.php'))) {
+            require_once base_path('plugins/link-checker/boot.php');
+            $lcResult = link_checker_service()->checkUrl('http://127.0.0.1/secret-panel');
+            $this->assertTrue($lcResult['is_broken']);
+            $this->assertStringContainsString('محظور', (string) $lcResult['error']);
+        }
+
+        // 2. Support Chat asset containment & SVG rejection
+        Option::updateOrCreate(['name' => 'support-chat', 'o_type' => 'plugins'], ['o_valuer' => 1]);
+        if (file_exists(base_path('plugins/support-chat/boot.php'))) {
+            require_once base_path('plugins/support-chat/boot.php');
+            $this->get('/support-chat/assets/../boot.php')->assertStatus(404);
+            $this->get('/support-chat/assets/bot.svg')->assertStatus(404);
+        }
+
+        // 3. Migration Manager path traversal guard
+        Option::updateOrCreate(['name' => 'migration-manager', 'o_type' => 'plugins'], ['o_valuer' => 1]);
+        if (file_exists(base_path('plugins/migration-manager/boot.php'))) {
+            require_once base_path('plugins/migration-manager/boot.php');
+            $migRes = $this->actingAs($this->admin)
+                ->withSession(['admin_password_confirmed_at' => time()])
+                ->post(route('admin.migration-manager.run'), [
+                    'migration' => '../../storage/framework/evil',
+                ]);
+            $migRes->assertSessionHas('error');
+        }
+
+        // 4. Smart Social Cards cache cleanup containment
+        Option::updateOrCreate(['name' => 'smart-social-cards', 'o_type' => 'plugins'], ['o_valuer' => 1]);
+        if (file_exists(base_path('plugins/smart-social-cards/boot.php'))) {
+            require_once base_path('plugins/smart-social-cards/boot.php');
+            $canary = $this->createCanaryRootFile('__ssc_canary_');
+            $deleted = smart_social_cards_service()->deleteTemporaryCard($canary);
+            $this->assertFalse($deleted);
+            $this->assertFileExists($canary);
         }
     }
 }

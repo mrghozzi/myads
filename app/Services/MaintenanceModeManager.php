@@ -204,13 +204,23 @@ class MaintenanceModeManager
 
     private function storeLogo(UploadedFile $logo, ?string $existingPath = null): string
     {
-        $directory = base_path('upload/maintenance');
-        if (! File::exists($directory)) {
-            File::makeDirectory($directory, 0755, true);
+        $security = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $security->validateImageUpload(
+            $logo,
+            \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+            'maintenance-logo'
+        );
+
+        if (! $validation['valid']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'maintenance_logo' => [$validation['error'] ?: 'Invalid maintenance logo image.'],
+            ]);
         }
 
-        $extension = strtolower((string) ($logo->getClientOriginalExtension() ?: $logo->extension() ?: 'png'));
-        $filename = 'maintenance-logo-' . time() . '-' . bin2hex(random_bytes(5)) . '.' . $extension;
+        $directory = base_path('upload/maintenance');
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($directory);
+
+        $filename = $validation['filename'];
         $logo->move($directory, $filename);
 
         $this->deleteLogo($existingPath);
@@ -225,10 +235,10 @@ class MaintenanceModeManager
             return;
         }
 
-        $absolutePath = base_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
-        if (File::exists($absolutePath)) {
-            File::delete($absolutePath);
-        }
+        app(\App\Services\Security\FileUploadSecurityService::class)->safeDeleteFile($relativePath, [
+            base_path('upload/maintenance'),
+            public_path('upload/maintenance'),
+        ]);
     }
 
     private function signedEmergencyToken(string $token): string

@@ -144,11 +144,16 @@ class ExtensionPackageUpgrader
 
     private function downloadArchive(string $downloadUrl, string $tempZipPath, string $type): void
     {
+        $urlCheck = app(\App\Services\Security\OutboundUrlSecurityService::class)->validateUrl($downloadUrl, true);
+        if (!$urlCheck['valid']) {
+            throw new RuntimeException($urlCheck['error'] ?: (__('messages.download_failed')));
+        }
+
         if (! File::exists(dirname($tempZipPath))) {
             File::makeDirectory(dirname($tempZipPath), 0755, true);
         }
 
-        $response = Http::withHeaders([
+        $response = http_secure()->withHeaders([
             'User-Agent' => 'MyAds-' . ucfirst($type) . '-Updater',
         ])->timeout(120)->get($downloadUrl);
 
@@ -161,14 +166,12 @@ class ExtensionPackageUpgrader
 
     private function extractArchive(string $tempZipPath, string $tempExtractPath): void
     {
-        $zip = new ZipArchive;
+        $extracted = app(\App\Services\Security\FileUploadSecurityService::class)
+            ->extractSafeZip($tempZipPath, $tempExtractPath);
 
-        if ($zip->open($tempZipPath) !== true) {
+        if (! $extracted) {
             throw new RuntimeException(__('messages.zip_open_failed'));
         }
-
-        $zip->extractTo($tempExtractPath);
-        $zip->close();
     }
 
     private function resolvePackageRoot(string $tempExtractPath, string $metadataFile): string

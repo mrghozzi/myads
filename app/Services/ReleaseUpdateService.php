@@ -384,6 +384,15 @@ class ReleaseUpdateService
         for ($index = 0; $index < $zip->numFiles; $index++) {
             $name = (string) $zip->getNameIndex($index);
             $this->assertSafeZipEntry($name);
+            if (method_exists($zip, 'getExternalAttributesIndex')) {
+                $opsys = 0;
+                $attr = 0;
+                if ($zip->getExternalAttributesIndex($index, $opsys, $attr) && $opsys === ZipArchive::OPSYS_UNIX) {
+                    if ((($attr >> 16) & 0170000) === 0120000) {
+                        throw new RuntimeException(__('messages.update_zip_unsafe_path', ['path' => $name]));
+                    }
+                }
+            }
         }
 
         $this->updateStageProgress($session, 'extract', 35, __('messages.update_stage_extract_detail'), null, null, true);

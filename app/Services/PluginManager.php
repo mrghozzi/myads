@@ -331,11 +331,8 @@ class PluginManager
 
         $tempExtractPath = storage_path('app/temp_plugins/' . uniqid());
         try {
-            $zip = new ZipArchive;
-            if ($zip->open($file->getPathname()) === TRUE) {
-                $zip->extractTo($tempExtractPath);
-                $zip->close();
-
+            $security = app(\App\Services\Security\FileUploadSecurityService::class);
+            if ($security->extractSafeZip($file->getPathname(), $tempExtractPath)) {
                 // Find root folder containing plugin.json
                 $rootFolder = $tempExtractPath;
                 if (!File::exists($tempExtractPath . '/plugin.json')) {
@@ -349,6 +346,8 @@ class PluginManager
                 return true;
             }
             return __('messages.plugin_zip_open_failed');
+        } catch (\RuntimeException $e) {
+            return $e->getMessage();
         } finally {
             if (File::exists($tempExtractPath)) {
                 File::deleteDirectory($tempExtractPath);

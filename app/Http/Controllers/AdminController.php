@@ -6731,7 +6731,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'maintenance_enabled' => ['nullable', 'boolean'],
             'maintenance_message' => ['nullable', 'string', 'max:5000'],
-            'maintenance_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:2048'],
+            'maintenance_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
             'remove_maintenance_logo' => ['nullable', 'boolean'],
             'allowed_ips' => ['nullable', 'string', 'max:1000'],
             'emergency_token' => ['nullable', 'string', 'max:255'],
@@ -6802,14 +6802,15 @@ class AdminController extends Controller
                     $tableName = reset($tableArray);
                 }
 
-                if ($tableName) {
+                if ($tableName && preg_match('/^[A-Za-z0-9_]+$/', (string) $tableName) === 1) {
+                    $cleanTableName = (string) $tableName;
                     try {
-                        DB::statement("REPAIR TABLE `{$tableName}`");
-                        DB::statement("OPTIMIZE TABLE `{$tableName}`");
+                        DB::statement("REPAIR TABLE `{$cleanTableName}`");
+                        DB::statement("OPTIMIZE TABLE `{$cleanTableName}`");
                     } catch (\Throwable) {
                         // Some engines (e.g. InnoDB on some MySQL/SQLite configurations) may not support REPAIR
                     }
-                    $results[] = $tableName;
+                    $results[] = $cleanTableName;
                 }
             }
             
@@ -7211,6 +7212,20 @@ class AdminController extends Controller
                 'message' => __('messages.ffmpeg_path_empty_msg') ?? 'Please provide a valid path to the FFmpeg binary executable.',
                 'log' => "[ERROR] FFmpeg binary path was empty."
             ]);
+        }
+
+        if (
+            preg_match('/[\r\n\0]/', $cleanPath) === 1
+            || !in_array(strtolower(basename(str_replace('\\', '/', $cleanPath))), ['ffmpeg', 'ffmpeg.exe'], true)
+        ) {
+            return response()->json([
+                'status' => 400,
+                'success' => false,
+                'error_type' => 'invalid_binary',
+                'title' => 'Invalid FFmpeg Binary Path',
+                'message' => 'Only a valid ffmpeg executable binary path is permitted.',
+                'log' => '[ERROR] Rejected non-ffmpeg binary path.'
+            ], 400);
         }
 
         // Test running FFmpeg

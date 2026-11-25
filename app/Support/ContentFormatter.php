@@ -42,7 +42,7 @@ class ContentFormatter
             'allow_unsafe_links' => false,
         ]));
 
-        return self::embedYouTubeLinks($html);
+        return HtmlSanitizer::sanitize(self::embedYouTubeLinks($html));
     }
 
     public static function embedYouTubeLinks(string $html): string
