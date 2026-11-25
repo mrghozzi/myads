@@ -1022,14 +1022,40 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
-            $imageName = time() . '_avatar.' . $request->avatar->extension();
-            $request->avatar->move(base_path('upload'), $imageName);
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $validation = $securityService->validateImageUpload(
+                $request->file('avatar'),
+                \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+                'avatar_' . $user->id
+            );
+            if (!$validation['valid']) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'avatar' => [$validation['error'] ?: __('messages.invalid_file_type')],
+                ]);
+            }
+            $uploadDir = base_path('upload');
+            \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($uploadDir);
+            $imageName = $validation['filename'];
+            $request->avatar->move($uploadDir, $imageName);
             $user->img = 'upload/' . $imageName;
         }
 
         if ($request->hasFile('cover')) {
-            $coverName = time() . '_cover.' . $request->cover->extension();
-            $request->cover->move(base_path('upload'), $coverName);
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $validation = $securityService->validateImageUpload(
+                $request->file('cover'),
+                \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+                'cover_' . $user->id
+            );
+            if (!$validation['valid']) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cover' => [$validation['error'] ?: __('messages.invalid_file_type')],
+                ]);
+            }
+            $uploadDir = base_path('upload');
+            \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($uploadDir);
+            $coverName = $validation['filename'];
+            $request->cover->move($uploadDir, $coverName);
 
             $option = Option::where('o_type', 'user')->where('o_order', $user->id)->first();
             if ($option) {

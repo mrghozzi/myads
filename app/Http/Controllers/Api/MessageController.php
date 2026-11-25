@@ -144,6 +144,10 @@ class MessageController extends Controller
 
         try {
             [$attachmentPath, $attachmentName, $attachmentSize] = $this->storeMessageAttachment($request);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => $e->validator->errors()->first() ?: __('messages.upload_failed'),
+            ], 422);
         } catch (\Throwable) {
             return response()->json(['error' => __('messages.upload_failed')], 500);
         }
@@ -284,8 +288,21 @@ class MessageController extends Controller
         $file = $request->file('attachment');
         $originalName = $file->getClientOriginalName();
         $fileSize = (int) $file->getSize();
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: '');
-        $filename = 'msg_' . time() . '_' . Str::random(10) . ($extension ? '.' . $extension : '');
+
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateMediaUpload(
+            $file,
+            \App\Services\Security\FileUploadSecurityService::ALLOWED_ATTACHMENT_EXTENSIONS,
+            'msg'
+        );
+
+        if (!$validation['valid']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'attachment' => [$validation['error'] ?: (__('messages.file_type_not_allowed') ?? 'File type not allowed.')],
+            ]);
+        }
+
+        $filename = $validation['filename'];
         $relativeDirectory = 'message_attachments';
         $destinationPath = storage_path('app/' . $relativeDirectory);
 

@@ -191,22 +191,23 @@ class MarketplaceExtensionFeedController extends Controller
         // Increment clicks
         $short->increment('clik');
 
-        if (!filter_var($short->url, FILTER_VALIDATE_URL)) {
-            $relativePath = ltrim($short->url, '/');
-            $basePath = base_path($relativePath);
-            if (file_exists($basePath)) {
-                return response()->download($basePath);
+        $target = trim((string) $short->url);
+        if (!preg_match('#^https?://#i', $target) || !filter_var($target, FILTER_VALIDATE_URL)) {
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $safePath = $securityService->resolveSafeExistingFile($target, [
+                base_path('upload'),
+                public_path('upload'),
+                storage_path('app/store_files'),
+                storage_path('app/public'),
+            ]);
+
+            if ($safePath !== null) {
+                return response()->download($safePath);
             }
-            $publicPath = public_path($relativePath);
-            if (file_exists($publicPath)) {
-                return response()->download($publicPath);
-            }
-            if (Storage::exists($short->url)) {
-                return Storage::download($short->url);
-            }
+
             abort(404, 'File missing from storage');
         }
 
-        return redirect($short->url);
+        return redirect($target);
     }
 }

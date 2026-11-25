@@ -45,7 +45,7 @@ class BlockSensitivePaths
         // Internal directories that should never be web-accessible
         '#^(storage|bootstrap|config|database|app|routes|tests|vendor|brain|~)(/|$)#i',
         // Uploaded PHP or executable scripts inside public upload directory
-        '#^upload/.*\.php(\d|s|ar|t)?$#i',
+        '#^upload/.*\.(php\d*|phtml|pht|phps|phar|cgi|pl|py|sh|bash|asp|aspx|jsp|exe|bat|cmd|vbs|htaccess|htpasswd|ini|env|config|svgz)$#i',
         // .env.example, .env.testing, etc.
         '#^\.env\..+$#i',
         // Security policy (not secret, but not meant as a route)

@@ -175,31 +175,29 @@ class CommentController extends Controller
 
 
         if ($file) {
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
-            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
-            if (!in_array($ext, $allowedExtensions, true)) {
-                return response()->json(['error' => __('messages.file_type_not_allowed') ?? 'File type not allowed'], 422);
-            }
-
             if ($file->getSize() > 5242880) {
                 return response()->json(['error' => 'File exceeds maximum size of 5 MB'], 422);
             }
 
             $securityService = app(FileUploadSecurityService::class);
-            if (!$securityService->validateBinaryMime($file, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'])) {
-                return response()->json(['error' => 'Invalid or unsafe file format'], 422);
+            $validation = $securityService->validateImageUpload(
+                $file,
+                FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+                'comment_' . $uid
+            );
+            if (!$validation['valid']) {
+                return response()->json(['error' => $validation['error'] ?: 'Invalid or unsafe file format'], 422);
             }
 
             $destinationPath = base_path('upload/comments');
-            if (!is_dir($destinationPath)) {
-                @mkdir($destinationPath, 0755, true);
-            }
+            FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
 
-            $filename = 'comment_' . $uid . '_' . time() . '_' . Str::random(10) . '.' . $ext;
+            $ext = $validation['extension'];
+            $filename = $validation['filename'];
             $file->move($destinationPath, $filename);
             $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;
 
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'bmp'], true) && function_exists('imagewebp')) {
+            if (in_array($ext, ['jpg', 'jpeg', 'png'], true) && function_exists('imagewebp')) {
                 $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
                 $webpFullPath = $destinationPath . DIRECTORY_SEPARATOR . $webpFilename;
                 if ($this->convertImageToWebp($fullPath, $webpFullPath, $ext)) {

@@ -418,13 +418,8 @@ class BillingController extends Controller
                 ])->save();
             }
 
-            if (is_file($legacyRootPath)) {
-                @unlink($legacyRootPath);
-            }
-
-            if (is_file($legacyPublicPath)) {
-                @unlink($legacyPublicPath);
-            }
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $securityService->safeDeleteFile($relativePath, [base_path('upload'), public_path('upload')]);
 
             return $protectedStoragePath;
         }

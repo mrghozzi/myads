@@ -34,6 +34,28 @@ class FileUploadSecurityService
     ];
 
     /**
+     * Standard safe attachment extensions allowed across chat and order workflows.
+     */
+    public const ALLOWED_ATTACHMENT_EXTENSIONS = [
+        'jpg', 'jpeg', 'png', 'gif', 'webp',
+        'pdf', 'zip', 'rar', '7z',
+        'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+        'txt', 'csv', 'rtf',
+    ];
+
+    /**
+     * Protected configuration files that must never be deleted by content actions.
+     */
+    private const PROTECTED_FILENAMES = [
+        '.htaccess',
+        '.htpasswd',
+        '.gitignore',
+        '.env',
+        '.env.example',
+        'index.php',
+    ];
+
+    /**
      * Known binary magic bytes signatures.
      */
     protected const MIME_MAGIC_SIGNATURES = [
@@ -537,6 +559,291 @@ class FileUploadSecurityService
             'extension' => $safeExt,
             'filename' => $filename,
         ];
+    }
+
+    /**
+     * Validate an uploaded ZIP package structure without banning script source files
+     * inside legitimate marketplace archives.
+     *
+     * @param mixed $file
+     * @param string $filenamePrefix
+     * @return array{valid: bool, error: ?string, extension: string, filename: string}
+     */
+    public function validateZipUpload(mixed $file, string $filenamePrefix = 'pkg'): array
+    {
+        if (!($file instanceof UploadedFile) || !$file->isValid()) {
+            return [
+                'valid' => false,
+                'error' => __('zipfile') ?: 'Invalid ZIP archive.',
+                'extension' => '',
+                'filename' => '',
+            ];
+        }
+
+        $clientExt = strtolower(trim((string) $file->getClientOriginalExtension()));
+        $clientName = (string) $file->getClientOriginalName();
+        if ($clientExt !== 'zip' || preg_match('/\.(php\d*|phtml|pht|phar|cgi|pl|py|sh|asp|jsp)\./i', $clientName)) {
+            return [
+                'valid' => false,
+                'error' => __('zipfile') ?: 'Only valid ZIP archives are allowed.',
+                'extension' => '',
+                'filename' => '',
+            ];
+        }
+
+        $filePath = $file->getPathname();
+        if (!$this->verifyMagicBytes($filePath, 'application/zip')) {
+            Log::warning("Security Alert: Rejected disguised non-ZIP file in zip uploader: {$clientName}");
+            return [
+                'valid' => false,
+                'error' => __('zipfile') ?: 'Uploaded file is not a valid ZIP archive.',
+                'extension' => '',
+                'filename' => '',
+            ];
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($filePath, ZipArchive::CHECKCONS) !== true) {
+            return [
+                'valid' => false,
+                'error' => __('zipfile') ?: 'Corrupted or invalid ZIP archive.',
+                'extension' => '',
+                'filename' => '',
+            ];
+        }
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entryName = (string) $zip->getNameIndex($i);
+            if (str_contains($entryName, "\0") || str_contains($entryName, '..') || str_starts_with($entryName, '/') || str_starts_with($entryName, '\\')) {
+                $zip->close();
+                Log::critical("Security Alert: Blocked ZIP archive with traversal entry: {$entryName}");
+                return [
+                    'valid' => false,
+                    'error' => __('zipfile') ?: 'Unsafe archive entries detected.',
+                    'extension' => '',
+                    'filename' => '',
+                ];
+            }
+        }
+        $zip->close();
+
+        return [
+            'valid' => true,
+            'error' => null,
+            'extension' => 'zip',
+            'filename' => $filenamePrefix . '_' . time() . '_' . \Illuminate\Support\Str::random(16) . '.zip',
+        ];
+    }
+
+    /**
+     * Resolve an existing file strictly inside one of the allowed base directories.
+     * Prevents directory traversal, null-byte tricks, root file disclosure, and
+     * root-level arbitrary deletion.
+     *
+     * @param string|null $relativePath
+     * @param array<int, string> $allowedBaseDirs
+     * @param array<int, string> $blockedExtensions
+     * @return string|null Canonical real filesystem path or null if unsafe/missing
+     */
+    public function resolveSafeExistingFile(
+        ?string $relativePath,
+        array $allowedBaseDirs,
+        array $blockedExtensions = self::FORBIDDEN_EXTENSIONS
+    ): ?string {
+        $candidate = trim((string) $relativePath);
+        if ($candidate === '' || str_contains($candidate, "\0") || str_contains($candidate, '://')) {
+            return null;
+        }
+
+        $normalized = ltrim(str_replace('\\', '/', $candidate), '/');
+        if ($normalized === '' || $this->containsTraversalSegment($normalized)) {
+            return null;
+        }
+
+        // Prevent accessing dot-prefixed sensitive root filenames regardless of directory depth
+        $basename = strtolower(basename($normalized));
+        if (in_array($basename, ['.env', '.env.example', '.htpasswd'], true)) {
+            return null;
+        }
+
+        if ($blockedExtensions !== []) {
+            $ext = strtolower(pathinfo($normalized, PATHINFO_EXTENSION));
+            if ($ext !== '' && in_array($ext, $blockedExtensions, true)) {
+                return null;
+            }
+        }
+
+        $searchCandidates = [$normalized];
+        // Also support stored relative paths whose prefix repeats a base directory folder name (e.g. upload/img.png inside base_path('upload'))
+        $firstSegment = strstr($normalized, '/', true);
+        if ($firstSegment !== false) {
+            $stripped = ltrim(substr($normalized, strlen($firstSegment) + 1), '/');
+            if ($stripped !== '') {
+                $searchCandidates[] = $stripped;
+            }
+        }
+
+        foreach ($allowedBaseDirs as $baseDir) {
+            $realBase = realpath($baseDir);
+            if ($realBase === false || !is_dir($realBase)) {
+                continue;
+            }
+
+            foreach ($searchCandidates as $rel) {
+                $fullCandidate = $realBase . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $rel);
+                $realFile = realpath($fullCandidate);
+                if ($realFile !== false && is_file($realFile) && $this->isCanonicalPathWithinDirectory($realFile, $realBase)) {
+                    // Do not match the base directory if normalized already targeted another directory prefix (e.g. storage/app/store_files vs upload/)
+                    if ($rel !== $normalized && strtolower(basename($realBase)) !== strtolower((string) $firstSegment)) {
+                        continue;
+                    }
+
+                    return $realFile;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Safely delete a file only if it resolves cleanly inside allowed base directories
+     * and is not a protected security/configuration file.
+     *
+     * @param string|null $relativePath
+     * @param array<int, string> $allowedBaseDirs
+     * @return bool
+     */
+    public function safeDeleteFile(?string $relativePath, array $allowedBaseDirs): bool
+    {
+        $realFile = $this->resolveSafeExistingFile($relativePath, $allowedBaseDirs, []);
+        if ($realFile === null) {
+            return false;
+        }
+
+        if (in_array(strtolower(basename($realFile)), self::PROTECTED_FILENAMES, true)) {
+            return false;
+        }
+
+        return @unlink($realFile);
+    }
+
+    /**
+     * Resolve an untrusted single directory child name safely inside a parent directory.
+     */
+    public function resolveSafeChildDirectory(string $childName, string $parentDir): ?string
+    {
+        $trimmed = trim($childName);
+        if (
+            $trimmed === ''
+            || $trimmed === '.'
+            || $trimmed === '..'
+            || str_contains($trimmed, '/')
+            || str_contains($trimmed, '\\')
+            || str_contains($trimmed, '..')
+            || str_contains($trimmed, "\0")
+        ) {
+            return null;
+        }
+
+        $realParent = realpath($parentDir);
+        if ($realParent === false || !is_dir($realParent)) {
+            return null;
+        }
+
+        $target = $realParent . DIRECTORY_SEPARATOR . $trimmed;
+        $realTarget = realpath($target);
+        if ($realTarget === false || !is_dir($realTarget)) {
+            return null;
+        }
+
+        return $this->isCanonicalPathWithinDirectory($realTarget, $realParent) ? $realTarget : null;
+    }
+
+    /**
+     * Verify whether a filesystem path resides strictly within one of the allowed directories.
+     * Enforces trailing directory separator matching to defeat sibling prefix bypasses.
+     *
+     * @param string $path
+     * @param array<int, string> $allowedDirectories
+     * @return bool
+     */
+    public function isPathWithinDirectories(string $path, array $allowedDirectories): bool
+    {
+        $realTarget = realpath($path);
+        if ($realTarget === false) {
+            $parentDir = realpath(dirname($path));
+            if ($parentDir === false) {
+                return false;
+            }
+            $realTarget = $parentDir . DIRECTORY_SEPARATOR . basename($path);
+        }
+
+        foreach ($allowedDirectories as $allowedDir) {
+            $realAllowed = realpath($allowedDir) ?: $allowedDir;
+            if ($this->isCanonicalPathWithinDirectory($realTarget, $realAllowed)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate an existing local gallery image path (legacy `img` input) inside upload/.
+     *
+     * @return string|null Normalized relative path (`upload/...`) or null if invalid
+     */
+    public function validateExistingUploadImage(?string $relativePath): ?string
+    {
+        $allowedDirs = [base_path('upload'), public_path('upload')];
+        $realFile = $this->resolveSafeExistingFile($relativePath, $allowedDirs);
+        if ($realFile === null) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($realFile, PATHINFO_EXTENSION));
+        if (!in_array($ext, self::ALLOWED_IMAGE_EXTENSIONS, true)) {
+            return null;
+        }
+
+        if ($this->containsExecutableCode($realFile) || !$this->validateBinaryMime($realFile, self::ALLOWED_IMAGE_MIMES)) {
+            return null;
+        }
+
+        foreach ($allowedDirs as $dir) {
+            $realDir = realpath($dir);
+            if ($realDir !== false && $this->isCanonicalPathWithinDirectory($realFile, $realDir)) {
+                $subPath = ltrim(str_replace('\\', '/', substr($realFile, strlen($realDir))), '/');
+                return 'upload/' . $subPath;
+            }
+        }
+
+        return null;
+    }
+
+    private function containsTraversalSegment(string $normalizedPath): bool
+    {
+        foreach (explode('/', $normalizedPath) as $segment) {
+            if ($segment === '..' || $segment === '.') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isCanonicalPathWithinDirectory(string $targetPath, string $baseDirectory): bool
+    {
+        $normalizedTarget = str_replace('\\', '/', $targetPath);
+        $normalizedBase = rtrim(str_replace('\\', '/', $baseDirectory), '/') . '/';
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $normalizedTarget = strtolower($normalizedTarget);
+            $normalizedBase = strtolower($normalizedBase);
+        }
+
+        return str_starts_with($normalizedTarget, $normalizedBase);
     }
 
     /**

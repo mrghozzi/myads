@@ -69,7 +69,12 @@ class InstallerGuard
             }
 
         } catch (\Exception $e) {
-            // DB connection failed entirely → allow installer
+            // SECURITY: If the application is already installed, never expose the installer
+            // during transient database outages — fail closed instead.
+            if (file_exists(base_path('.env')) && !app()->runningUnitTests()) {
+                return redirect('/')->with('error', 'Application is already installed.');
+            }
+
             return $next($request);
         }
 

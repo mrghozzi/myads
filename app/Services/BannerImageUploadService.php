@@ -11,9 +11,9 @@ use Illuminate\Validation\ValidationException;
 class BannerImageUploadService
 {
     /**
-     * Allowed image extensions.
+     * Allowed image extensions (SVG intentionally excluded to prevent Stored XSS).
      */
-    protected const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    protected const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
     /**
      * Maximum file size in kilobytes (5MB).
@@ -97,32 +97,19 @@ class BannerImageUploadService
             ]);
         }
 
-        // Extension & MIME check
-        $extension = strtolower((string) ($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'png'));
-        if ($extension === 'jpeg') {
-            $extension = 'jpg';
-        }
-
-        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+        // Extension, executable payload & binary MIME inspection via FileUploadSecurityService
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateImageUpload($file, self::ALLOWED_EXTENSIONS, 'banner');
+        if (!$validation['valid']) {
             throw ValidationException::withMessages([
-                $attributeKey => [__('messages.invalid_image_format') ?: 'Allowed image types: JPG, PNG, GIF, WEBP, SVG.'],
-            ]);
-        }
-
-        // MIME type inspection for extra security
-        $mime = $file->getMimeType();
-        if ($mime && !str_starts_with($mime, 'image/') && $extension !== 'svg') {
-            throw ValidationException::withMessages([
-                $attributeKey => [__('messages.invalid_image_file') ?: 'The file must be a valid image.'],
+                $attributeKey => [$validation['error'] ?: (__('messages.invalid_image_format') ?: 'Allowed image types: JPG, PNG, GIF, WEBP.')],
             ]);
         }
 
         $targetDir = base_path(self::UPLOAD_SUBDIR);
-        if (!File::isDirectory($targetDir)) {
-            File::makeDirectory($targetDir, 0755, true);
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($targetDir);
 
-        $filename = 'banner_' . time() . '_' . Str::random(12) . '.' . $extension;
+        $filename = $validation['filename'];
         $file->move($targetDir, $filename);
 
         return url(self::UPLOAD_SUBDIR . '/' . $filename);

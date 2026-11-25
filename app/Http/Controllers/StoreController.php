@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\Product;
 use App\Models\ProductFile;
 use App\Models\Short;
@@ -381,8 +382,8 @@ class StoreController extends Controller
             'cat_s' => ['required', 'string', Rule::in(StoreCategoryCatalog::acceptedInputValues())],
             'sc_cat' => ['required', 'string'],
             'txt' => ['required', 'string', 'min:10'],
-            'linkzip' => ['required', 'string'],
-            'img' => ['required', 'string'],
+            'linkzip' => ['required', 'string', 'max:2048'],
+            'img' => ['required', 'string', 'max:2048'],
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end' => ['nullable', 'date', 'after_or_equal:sale_start'],
@@ -390,6 +391,9 @@ class StoreController extends Controller
             'video_url' => ['nullable', 'string', 'max:2048'],
             'screenshots' => ['nullable'],
         ]);
+
+        $normalizedLinkzip = $this->validateStoreSourceInput((string) $request->input('linkzip'));
+        $request->merge(['linkzip' => $normalizedLinkzip]);
 
         $user = Auth::user();
 
@@ -820,9 +824,9 @@ class StoreController extends Controller
         $request->validate([
             'vnbr'       => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'desc'       => ['required', 'string', 'min:10', 'max:65535'],
-            'linkzip'    => ['required', 'string'],
+            'linkzip'    => ['required', 'string', 'max:2048'],
             'pts'        => ['nullable', 'integer', 'min:0', 'max:999999'],
-            'img'        => ['nullable', 'string'],
+            'img'        => ['nullable', 'string', 'max:2048'],
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
@@ -830,6 +834,9 @@ class StoreController extends Controller
             'video_url'  => ['nullable', 'string', 'max:2048'],
             'screenshots' => ['nullable'],
         ]);
+
+        $normalizedLinkzip = $this->validateStoreSourceInput((string) $request->input('linkzip'));
+        $request->merge(['linkzip' => $normalizedLinkzip]);
 
         $fileOption = ProductFile::create([
             'name'     => $request->vnbr,
@@ -987,16 +994,17 @@ class StoreController extends Controller
         ]);
 
         $file = $request->file('fzip');
-        $extension = $file->getClientOriginalExtension();
-        if (strtolower($extension) !== 'zip') {
-            return response($this->renderZipUploadFragment(null, __('zipfile')));
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateZipUpload($file, 'store');
+
+        if (!$validation['valid']) {
+            return response($this->renderZipUploadFragment(null, $validation['error'] ?: __('zipfile')), 422);
         }
 
-        $filename = time() . '_' . Str::random(8) . '.' . $extension;
+        $filename = $validation['filename'];
         $destinationPath = base_path('upload');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+
         $file->move($destinationPath, $filename);
         $relativePath = 'upload/' . $filename;
         $displayName = $file->getClientOriginalName();
@@ -2028,25 +2036,53 @@ class StoreController extends Controller
     {
         $short->increment('clik');
 
-        if (!filter_var($short->url, FILTER_VALIDATE_URL)) {
-            $relativePath = ltrim($short->url, '/');
-            $basePath = base_path($relativePath);
-            if (file_exists($basePath)) {
-                return response()->download($basePath);
+        $target = trim((string) $short->url);
+        if (!preg_match('#^https?://#i', $target) || !filter_var($target, FILTER_VALIDATE_URL)) {
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $safePath = $securityService->resolveSafeExistingFile($target, [
+                base_path('upload'),
+                public_path('upload'),
+                storage_path('app/store_files'),
+                storage_path('app/public'),
+            ]);
+
+            if ($safePath !== null) {
+                return response()->download($safePath);
             }
-            $publicPath = public_path($relativePath);
-            if (file_exists($publicPath)) {
-                return response()->download($publicPath);
-            }
-            if (Storage::exists($short->url)) {
-                return Storage::download($short->url);
-            }
+
             abort(404, 'File missing from storage');
         }
 
         app(\App\Services\GamificationService::class)->recordEvent((int) Auth::id(), 'product_downloaded');
 
-        return redirect($short->url);
+        return redirect($target);
+    }
+
+    /**
+     * Ensure store product package source is either an HTTP(S) URL or a safe archive path under upload/ or store_files/.
+     */
+    private function validateStoreSourceInput(string $rawInput): string
+    {
+        $trimmed = trim($rawInput);
+        if (preg_match('#^https?://#i', $trimmed) && filter_var($trimmed, FILTER_VALIDATE_URL)) {
+            return $trimmed;
+        }
+
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $safePath = $securityService->resolveSafeExistingFile($trimmed, [
+            base_path('upload'),
+            public_path('upload'),
+            storage_path('app/store_files'),
+            storage_path('app/public'),
+        ]);
+
+        if ($safePath !== null && strtolower(pathinfo($safePath, PATHINFO_EXTENSION)) === 'zip') {
+            return ltrim(str_replace('\\', '/', $trimmed), '/');
+        }
+
+        throw ValidationException::withMessages([
+            'linkzip' => [__('zipfile') ?: 'Please provide a valid HTTPS/HTTP download URL or an uploaded ZIP package inside upload/.'],
+        ]);
     }
 
     private function storeCategoryOptions()

@@ -272,6 +272,13 @@ class MessageController extends Controller
 
         try {
             [$attachmentPath, $attachmentName, $attachmentSize] = $this->storeMessageAttachment($request);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->messageErrorResponse(
+                $request,
+                $e->validator->errors()->first() ?: __('messages.upload_failed'),
+                422,
+                'attachment'
+            );
         } catch (\Throwable) {
             return $this->messageErrorResponse($request, __('messages.upload_failed'), 500, 'attachment');
         }
@@ -306,20 +313,18 @@ class MessageController extends Controller
             })
             ->firstOrFail();
 
-        $relativePath = ltrim((string) $message->attachment_path, '/\\');
+        $relativePath = trim((string) $message->attachment_path);
         if ($relativePath === '') {
             abort(404);
         }
 
-        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
-        $storageFile = storage_path('app/' . $normalizedPath);
-        $legacyPublicFile = public_path($normalizedPath);
+        $filePath = app(\App\Services\Security\FileUploadSecurityService::class)->resolveSafeExistingFile(
+            $relativePath,
+            [storage_path('app/message_attachments'), public_path('upload'), base_path('upload')],
+            []
+        );
 
-        if (is_file($storageFile)) {
-            $filePath = $storageFile;
-        } elseif (is_file($legacyPublicFile)) {
-            $filePath = $legacyPublicFile;
-        } else {
+        if ($filePath === null) {
             abort(404);
         }
 
@@ -467,24 +472,21 @@ class MessageController extends Controller
         $file = $request->file('attachment');
         $originalName = $file->getClientOriginalName();
         $fileSize = (int) $file->getSize();
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: '');
 
-        // SECURITY: Block dangerous executable extensions as defense-in-depth
-        $blockedExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'phps', 'phar', 'exe', 'bat', 'cmd', 'sh', 'cgi', 'pl', 'py', 'jsp', 'asp', 'aspx'];
-        if (in_array($extension, $blockedExtensions, true)) {
-            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateMediaUpload(
+            $file,
+            \App\Services\Security\FileUploadSecurityService::ALLOWED_ATTACHMENT_EXTENSIONS,
+            'msg'
+        );
+
+        if (!$validation['valid']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'attachment' => [$validation['error'] ?: (__('messages.file_type_not_allowed') ?? 'File type not allowed.')],
+            ]);
         }
 
-        // SECURITY: Block dangerous MIME types
-        $mimeType = strtolower((string) ($file->getClientMimeType() ?: ''));
-        $blockedMimePrefixes = ['application/x-httpd-php', 'application/x-php', 'text/x-php', 'application/x-executable'];
-        foreach ($blockedMimePrefixes as $prefix) {
-            if (str_starts_with($mimeType, $prefix)) {
-                throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
-            }
-        }
-
-        $filename = 'msg_' . time() . '_' . Str::random(10) . ($extension ? '.' . $extension : '');
+        $filename = $validation['filename'];
         $relativeDirectory = 'message_attachments';
         $destinationPath = storage_path('app/' . $relativeDirectory);
 

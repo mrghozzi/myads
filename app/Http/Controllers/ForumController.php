@@ -1189,21 +1189,16 @@ class ForumController extends Controller
 
     private function deleteTopicAttachments($attachments): void
     {
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $allowedDirs = [
+            storage_path('app/forum_attachments'),
+            storage_path('app/upload'),
+            public_path('upload'),
+            base_path('upload'),
+        ];
+
         foreach ($attachments as $attachment) {
-            $relativePath = ltrim((string) $attachment->file_path, '/\\');
-            $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
-
-            $storageFile = storage_path('app/' . $normalizedPath);
-            $legacyPublicFile = public_path($normalizedPath);
-
-            if (is_file($storageFile)) {
-                @unlink($storageFile);
-            } elseif (is_file($legacyPublicFile)) {
-                @unlink($legacyPublicFile);
-            } elseif (is_file(base_path($normalizedPath))) {
-                @unlink(base_path($normalizedPath));
-            }
-
+            $securityService->safeDeleteFile((string) $attachment->file_path, $allowedDirs);
             $attachment->delete();
         }
     }

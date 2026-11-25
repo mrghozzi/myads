@@ -668,10 +668,15 @@ class StatusPostService
     {
         $uploadedFiles = $request->file('images', []);
         $legacyPath = $request->input('img');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
 
         $paths = [];
         if ($legacyPath && is_string($legacyPath)) {
-            $paths[] = $legacyPath;
+            $validatedLegacy = $securityService->validateExistingUploadImage($legacyPath);
+            if ($validatedLegacy === null) {
+                throw new \RuntimeException(__('messages.invalid_file_type') ?: 'Invalid image path.');
+            }
+            $paths[] = $validatedLegacy;
         }
 
         foreach ($uploadedFiles as $file) {
@@ -921,10 +926,15 @@ class StatusPostService
 
     private function deleteAttachmentFile(ForumAttachment $attachment): void
     {
-        $path = public_path($attachment->file_path);
-        if (file_exists($path)) {
-            @unlink($path);
-        }
+        app(\App\Services\Security\FileUploadSecurityService::class)->safeDeleteFile(
+            (string) $attachment->file_path,
+            [
+                storage_path('app/forum_attachments'),
+                storage_path('app/upload'),
+                public_path('upload'),
+                base_path('upload'),
+            ]
+        );
     }
 
     private function syncStatusType(int $topicId): void

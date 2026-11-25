@@ -234,10 +234,10 @@ class AdminOrderController extends Controller
             Option::where('o_parent', $orderId)->whereIn('o_type', ['o_order', 'order_comment'])->delete();
 
             if ($order->attachment_path) {
-                $filePath = storage_path('app/' . ltrim($order->attachment_path, '/\\'));
-                if (is_file($filePath)) {
-                    @unlink($filePath);
-                }
+                app(\App\Services\Security\FileUploadSecurityService::class)->safeDeleteFile(
+                    (string) $order->attachment_path,
+                    [storage_path('app/order_attachments'), storage_path('app/order_deliverables')]
+                );
             }
 
             $order->delete();

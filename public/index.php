@@ -28,7 +28,7 @@ $blockedPatterns = [
     '#^\.git(|hub|ignore|attributes|modules)(/|$)#', // Git metadata
     '#^\.editorconfig$#',        // Editor config
     '#^storage/(logs|framework)(/|$)#', // Sensitive storage directories
-    '#^upload/.*\.php(\d|s|ar|t)?$#',   // PHP files in upload directory
+    '#^upload/.*\.(php\d*|phtml|pht|phps|phar|cgi|pl|py|sh|bash|asp|aspx|jsp|exe|bat|cmd|vbs|htaccess|htpasswd|ini|env|config|svgz)$#', // Executable/script/config files in upload directory
 ];
 
 foreach ($blockedPatterns as $pattern) {
@@ -50,11 +50,9 @@ if (file_exists($maintenance = $baseDir . '/storage/framework/maintenance.php'))
     require $maintenance;
 }
 
-// Auto-create .env from .env.example if missing (fresh install support)
-if (!file_exists($baseDir . '/.env') && file_exists($baseDir . '/.env.example')) {
+// Auto-create .env from .env.example ONLY on fresh installs (never reset an already-installed site)
+if (!file_exists($baseDir . '/.env') && file_exists($baseDir . '/.env.example') && !file_exists($baseDir . '/storage/installed')) {
     copy($baseDir . '/.env.example', $baseDir . '/.env');
-    // Remove stale installed marker on fresh install
-    @unlink($baseDir . '/storage/installed');
 }
 
 // Ensure required storage directories exist (shared hosting may lack them)

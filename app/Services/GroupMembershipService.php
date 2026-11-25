@@ -324,11 +324,14 @@ class GroupMembershipService
         }
 
         DB::transaction(function () use ($group) {
-            if ($group->avatar_path && file_exists(base_path($group->avatar_path)) && !str_contains($group->avatar_path, 'group.png')) {
-                @unlink(base_path($group->avatar_path));
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $uploadDirs = [base_path('upload'), public_path('upload')];
+
+            if ($group->avatar_path && !str_contains($group->avatar_path, 'group.png')) {
+                $securityService->safeDeleteFile($group->avatar_path, $uploadDirs);
             }
-            if ($group->cover_path && file_exists(base_path($group->cover_path)) && !str_contains($group->cover_path, 'cover')) {
-                @unlink(base_path($group->cover_path));
+            if ($group->cover_path && !str_contains($group->cover_path, 'cover')) {
+                $securityService->safeDeleteFile($group->cover_path, $uploadDirs);
             }
 
             Status::where('group_id', $group->id)->update(['group_id' => null]);
@@ -340,16 +343,27 @@ class GroupMembershipService
 
     public function saveGroupImage(\Illuminate\Http\UploadedFile $file, string $prefix, int $groupId, ?string $oldPath = null): string
     {
-        $extension = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'jpg');
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
-            $extension = 'jpg';
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateImageUpload(
+            $file,
+            \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+            "group_{$prefix}_{$groupId}"
+        );
+
+        if (!$validation['valid']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                $prefix => [$validation['error'] ?: __('messages.invalid_file_type')],
+            ]);
         }
 
-        $filename = "group_{$prefix}_{$groupId}_" . time() . '_' . Str::random(8) . '.' . $extension;
-        $file->move(base_path('upload'), $filename);
+        $uploadDir = base_path('upload');
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($uploadDir);
 
-        if ($oldPath && file_exists(base_path($oldPath)) && !str_contains($oldPath, 'group.png') && !str_contains($oldPath, 'cover')) {
-            @unlink(base_path($oldPath));
+        $filename = $validation['filename'];
+        $file->move($uploadDir, $filename);
+
+        if ($oldPath && !str_contains($oldPath, 'group.png') && !str_contains($oldPath, 'cover')) {
+            $securityService->safeDeleteFile($oldPath, [$uploadDir, public_path('upload')]);
         }
 
         return 'upload/' . $filename;

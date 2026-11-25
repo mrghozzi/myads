@@ -195,4 +195,50 @@ class PollinationsAiMemberTest extends TestCase
 
         $response->assertRedirect();
     }
+
+    public function test_admin_save_rejects_malicious_polyglot_bot_avatar_and_accepts_clean_png(): void
+    {
+        $admin = $this->createAdminUser();
+
+        Http::fake([
+            'https://image.pollinations.ai/*' => Http::response(
+                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Z0XQAAAAASUVORK5CYII='),
+                200,
+                ['Content-Type' => 'image/png']
+            ),
+        ]);
+
+        $polyglot = \Illuminate\Http\UploadedFile::fake()->createWithContent('evil.gif', "GIF89a<?php echo 'shell'; ?>");
+        $badResponse = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->post('/admin/pollinations-ai-member/save', [
+                'is_enabled' => 1,
+                'bot_avatar_file' => $polyglot,
+            ]);
+
+        $badResponse->assertRedirect();
+        $badResponse->assertSessionHas('error');
+
+        $cleanPng = \Illuminate\Http\UploadedFile::fake()->createWithContent(
+            'bot.png',
+            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Z0XQAAAAASUVORK5CYII=')
+        );
+        $okResponse = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->post('/admin/pollinations-ai-member/save', [
+                'is_enabled' => 1,
+                'bot_avatar_file' => $cleanPng,
+            ]);
+
+        $okResponse->assertRedirect();
+        $okResponse->assertSessionHas('success');
+
+        $savedPath = pollinations_ai_member_service()->getConfig()['custom_avatar_path'] ?? '';
+        $this->assertStringStartsWith('upload/avatar/custom_bot_avatar_', $savedPath);
+        $this->assertStringEndsWith('.png', $savedPath);
+
+        if ($savedPath !== '' && file_exists(public_path($savedPath))) {
+            @unlink(public_path($savedPath));
+        }
+    }
 }

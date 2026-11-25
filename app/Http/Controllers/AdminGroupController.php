@@ -224,14 +224,17 @@ class AdminGroupController extends Controller
     public function clearMedia(Request $request, Group $group)
     {
         $type = (string) $request->input('type');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $uploadDirs = [base_path('upload'), public_path('upload')];
+
         if ($type === 'avatar') {
-            if ($group->avatar_path && file_exists(base_path($group->avatar_path)) && !str_contains($group->avatar_path, 'group.png')) {
-                @unlink(base_path($group->avatar_path));
+            if ($group->avatar_path && !str_contains($group->avatar_path, 'group.png')) {
+                $securityService->safeDeleteFile($group->avatar_path, $uploadDirs);
             }
             $group->update(['avatar_path' => null]);
         } elseif ($type === 'cover') {
-            if ($group->cover_path && file_exists(base_path($group->cover_path)) && !str_contains($group->cover_path, 'cover')) {
-                @unlink(base_path($group->cover_path));
+            if ($group->cover_path && !str_contains($group->cover_path, 'cover')) {
+                $securityService->safeDeleteFile($group->cover_path, $uploadDirs);
             }
             $group->update(['cover_path' => null]);
         }

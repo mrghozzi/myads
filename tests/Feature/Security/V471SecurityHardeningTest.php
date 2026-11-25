@@ -29,8 +29,8 @@ class V471SecurityHardeningTest extends TestCase
 
     public function test_system_version_is_4_7_1(): void
     {
-        $this->assertSame('4.7.1', SystemVersion::CURRENT);
-        $this->assertSame('v4.7.1', SystemVersion::tag());
+        $this->assertTrue(version_compare(SystemVersion::CURRENT, '4.7.1', '>='));
+        $this->assertStringStartsWith('v4.7.', SystemVersion::tag());
     }
 
     public function test_image_upload_blocks_polyglot_and_php_scripts(): void

@@ -353,11 +353,13 @@ class OrderRequestController extends Controller
             abort(404);
         }
 
-        $relativePath = ltrim((string) $order->attachment_path, '/\\');
-        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
-        $filePath = storage_path('app/' . $normalizedPath);
+        $filePath = app(\App\Services\Security\FileUploadSecurityService::class)->resolveSafeExistingFile(
+            (string) $order->attachment_path,
+            [storage_path('app/order_attachments'), storage_path('app/order_deliverables')],
+            []
+        );
 
-        if (!is_file($filePath)) {
+        if ($filePath === null) {
             abort(404);
         }
 
@@ -379,11 +381,13 @@ class OrderRequestController extends Controller
             abort(403);
         }
 
-        $relativePath = ltrim((string) $contract->delivery_attachment_path, '/\\');
-        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
-        $filePath = storage_path('app/' . $normalizedPath);
+        $filePath = app(\App\Services\Security\FileUploadSecurityService::class)->resolveSafeExistingFile(
+            (string) $contract->delivery_attachment_path,
+            [storage_path('app/order_deliverables'), storage_path('app/order_attachments')],
+            []
+        );
 
-        if (!is_file($filePath)) {
+        if ($filePath === null) {
             abort(404);
         }
 
@@ -570,14 +574,21 @@ class OrderRequestController extends Controller
     private function handleUploadedFile($file, string $subfolder): array
     {
         $originalName = $file->getClientOriginalName();
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $securityService->validateMediaUpload(
+            $file,
+            \App\Services\Security\FileUploadSecurityService::ALLOWED_ATTACHMENT_EXTENSIONS,
+            'order'
+        );
 
-        $blockedExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'phps', 'phar', 'exe', 'bat', 'cmd', 'sh', 'cgi', 'pl', 'py', 'jsp', 'asp', 'aspx', 'vbs'];
-        if (in_array($extension, $blockedExtensions, true)) {
-            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+        if (!$validation['valid']) {
+            $field = $subfolder === 'order_deliverables' ? 'delivery_attachment' : 'attachment';
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                $field => [$validation['error'] ?: (__('messages.file_type_not_allowed') ?? 'File type not allowed.')],
+            ]);
         }
 
-        $filename = 'order_' . time() . '_' . \Illuminate\Support\Str::random(12) . ($extension ? '.' . $extension : '');
+        $filename = $validation['filename'];
         $destinationPath = storage_path('app/' . $subfolder);
 
         if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {

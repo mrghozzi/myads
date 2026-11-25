@@ -128,16 +128,21 @@ class AdminMediaController extends Controller
         $targetKey = $request->input('target_dir', 'public_upload');
         $targetPath = $targetKey === 'upload' ? base_path('upload') : public_path('upload');
 
-        if (!File::exists($targetPath)) {
-            File::makeDirectory($targetPath, 0755, true);
-        }
+        \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($targetPath);
 
         $uploadedFiles = $request->file('files');
         if (!is_array($uploadedFiles)) {
             $uploadedFiles = [$uploadedFiles];
         }
 
-        $forbiddenExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'cgi', 'pl', 'exe', 'sh', 'bat'];
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $allowedExtensions = [
+            'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+            'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv',
+            'mp3', 'wav', 'm4a', 'flac', 'aac',
+            'zip', 'rar', '7z', 'gz', 'tar',
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'md', 'css', 'json',
+        ];
         $uploadedCount = 0;
 
         foreach ($uploadedFiles as $file) {
@@ -146,11 +151,21 @@ class AdminMediaController extends Controller
             }
 
             $ext = strtolower($file->getClientOriginalExtension());
-            if (in_array($ext, $forbiddenExtensions)) {
-                return redirect()->back()->with('error', 'Security error: Executable files are not allowed for upload.');
+            $originalName = (string) $file->getClientOriginalName();
+            if (
+                in_array($ext, \App\Services\Security\FileUploadSecurityService::FORBIDDEN_EXTENSIONS, true)
+                || !in_array($ext, $allowedExtensions, true)
+                || preg_match('/\.(php\d*|phtml|pht|phar|cgi|pl|py|sh|asp|jsp)\./i', $originalName)
+                || $securityService->containsExecutableCode($file->getPathname())
+            ) {
+                $errorMsg = 'Security error: Executable or disallowed files are not allowed for upload.';
+                if ($request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $errorMsg], 422);
+                }
+                return redirect()->back()->with('error', $errorMsg);
             }
 
-            $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $filename = pathinfo($originalName, PATHINFO_FILENAME);
             $slugName = Str::slug($filename);
             if (empty($slugName)) {
                 $slugName = 'media_' . time();
@@ -183,7 +198,7 @@ class AdminMediaController extends Controller
 
         // SECURITY: Block path traversal in new filename
         $newName = $request->new_name;
-        if (str_contains($newName, '..') || str_contains($newName, '/') || str_contains($newName, '\\')) {
+        if (str_contains($newName, '..') || str_contains($newName, '/') || str_contains($newName, '\\') || str_starts_with(strtolower($newName), '.ht')) {
             return redirect()->back()->with('error', 'Invalid filename.');
         }
 
@@ -191,8 +206,8 @@ class AdminMediaController extends Controller
         $directory = dirname($oldPath);
         $newPath = $directory . DIRECTORY_SEPARATOR . $newName;
 
-        // SECURITY: Validate that both old and new paths are within allowed upload directories
-        if (!$this->isWithinAllowedDirectory($oldPath) || !$this->isWithinAllowedDirectory($newPath)) {
+        // SECURITY: Validate that both old and new paths are within allowed upload directories and never touch .htaccess/.htpasswd
+        if (!$this->isWithinAllowedDirectory($oldPath) || !$this->isWithinAllowedDirectory($newPath) || str_starts_with(strtolower(basename($oldPath)), '.ht')) {
             return redirect()->back()->with('error', 'Access denied: path is outside allowed directories.');
         }
 
@@ -221,8 +236,8 @@ class AdminMediaController extends Controller
 
         $filePath = base_path($request->path);
 
-        // SECURITY: Validate that the path is within allowed upload directories
-        if (!$this->isWithinAllowedDirectory($filePath)) {
+        // SECURITY: Validate that the path is within allowed upload directories and protect security files
+        if (!$this->isWithinAllowedDirectory($filePath) || str_starts_with(strtolower(basename($filePath)), '.ht')) {
             return redirect()->back()->with('error', 'Access denied: path is outside allowed directories.');
         }
 
@@ -252,7 +267,7 @@ class AdminMediaController extends Controller
         $deletedCount = 0;
         foreach ($request->paths as $relPath) {
             $fullPath = base_path($relPath);
-            if ($this->isWithinAllowedDirectory($fullPath) && File::exists($fullPath)) {
+            if ($this->isWithinAllowedDirectory($fullPath) && !str_starts_with(strtolower(basename($fullPath)), '.ht') && File::exists($fullPath)) {
                 try {
                     File::delete($fullPath);
                     $deletedCount++;
@@ -399,29 +414,10 @@ class AdminMediaController extends Controller
      */
     private function isWithinAllowedDirectory(string $path): bool
     {
-        $realPath = realpath($path);
-        if ($realPath === false) {
-            $parentDir = realpath(dirname($path));
-            if ($parentDir === false) {
-                return false;
-            }
-            $realPath = $parentDir . DIRECTORY_SEPARATOR . basename($path);
-        }
-
-        $normalizedPath = strtolower(str_replace('\\', '/', $realPath));
-
-        $allowedDirectories = [
-            strtolower(str_replace('\\', '/', realpath(base_path('upload')) ?: base_path('upload'))),
-            strtolower(str_replace('\\', '/', realpath(public_path('upload')) ?: public_path('upload'))),
-        ];
-
-        foreach ($allowedDirectories as $allowedDir) {
-            if (str_starts_with($normalizedPath, $allowedDir)) {
-                return true;
-            }
-        }
-
-        return false;
+        return app(\App\Services\Security\FileUploadSecurityService::class)->isPathWithinDirectories($path, [
+            base_path('upload'),
+            public_path('upload'),
+        ]);
     }
 
     private function getFileIcon($extension)

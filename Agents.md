@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.7.1
+# Agents.md — MYADS v4.7.2
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.7.1
+- **Name:** MYADS v4.7.2
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -178,6 +178,13 @@ MYADS is a community platform where website owners:
     - **Installer Sandbox Isolation & Lifecycle Resilience (`ReleaseUpdateService`, `InstallerServiceProvider`):** Excluded `installer/` from release archive extraction in `ReleaseUpdateService::finalizeUpdate()`, added automatic `installer/` directory deletion upon upgrade completion (`cleanupUpdate()`), and provided graceful `file_exists()` pre-checks in `InstallerServiceProvider` so deleting the installer directory never causes fatal stream errors.
     - **Update Safety Preflight & Migration Inspection (`UpdateSafetyService`):** Extended migration safety analyzer with `@allow-destructive` docblock annotation support, preventing false-positive blocks on intentional schema cleanups while blocking accidental drops.
     - **100% Automated Test Coverage:** Validated by `V471SecurityHardeningTest.php` (10 tests, 32 assertions, 100% pass rate) and `UpdateSafetyFeatureTest.php` (14 tests, 63 assertions, 100% pass rate).
+80. **Core Security Hardening, Path-Containment, Anti-Disclosure, Anti-Delete & Upload Defense Parity Release (v4.7.2)** — Comprehensive security remediation closing residual filesystem, disclosure, traversal, and upload bypass vectors across the platform:
+    - **Centralized Path-Containment & Safe Deletion Engine (`FileUploadSecurityService`):** Added `resolveSafeExistingFile()`, `safeDeleteFile()`, `resolveSafeChildDirectory()`, `isPathWithinDirectories()`, `validateExistingUploadImage()`, and `validateZipUpload()` enforcing canonical `realpath()` containment inside explicit upload/attachment directories, sibling-prefix trailing-separator protection, and protected file safeguards (`.htaccess`, `.env`, `index.php`).
+    - **Arbitrary File Deletion Fix (`StatusPostService`, `StatusController`, `ForumController`):** Validated legacy `img` gallery inputs strictly as real images inside `upload/` (`validateExistingUploadImage`) and routed all attachment unlinks through `safeDeleteFile()`, eliminating arbitrary root/system file deletion (`@unlink(base_path(...))`).
+    - **Arbitrary File Disclosure & Store ZIP Hardening (`StoreController`, `MarketplaceExtensionFeedController`):** Validated `linkzip` sources strictly as HTTP(S) URLs or `.zip` packages inside approved upload/store directories, restricted `deliverShort()` local downloads via `resolveSafeExistingFile()`, and fortified `StoreController::uploadZip()` with `PK` magic bytes, `ZipArchive::CHECKCONS`, and archive traversal inspection.
+    - **Admin Language Traversal & Deletion Protection (`AdminController`):** Enforced strict locale regex (`^[a-zA-Z]{2,5}(?:[_-][a-zA-Z0-9]{2,8})?$`) in `storeLanguage()` and `updateLanguage()` and canonical child-directory containment (`resolveSafeChildDirectory`) in `deleteLanguage()`, `editLanguageTerms()`, and `updateLanguageTerms()`.
+    - **Complete Upload Handler Parity & Pre-Boot `.phtml`/`.env` Hardening:** Eliminated SVG banner uploads (`BannerImageUploadService`), routed profile, comment, group, news, order, message, and admin media uploads through `FileUploadSecurityService`, added `.phtml` and script/config patterns to `BlockSensitivePaths`, `index.php`, `public/index.php`, and `nginx-security.conf`, prevented auto-removal of `storage/installed` on installed sites, and failed closed in `InstallerGuard` on DB errors for installed instances.
+    - **100% Automated Test Coverage:** Validated by `V472SecurityHardeningTest.php`.
 
 ---
 
@@ -1402,9 +1409,16 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
     - Extended pre-boot pattern shields in `index.php`, `public/index.php`, and `BlockSensitivePaths` middleware, immediately aborting with HTTP 403 Access Denied for any direct requests attempting to reach `/storage/logs/*`, `/storage/framework/*`, or any `.php` files inside `/upload/*` before the Laravel router or framework boots.
   - **100% Automated Test Coverage:** Validated by `V471SecurityHardeningTest.php` (9 tests, 31 assertions, 100% pass rate).
 
+- **v4.7.2 Official Release — Core Path-Containment, Anti-Deletion, Anti-Disclosure, Language Traversal & Complete Upload Parity Security Release (2026-11-25):**
+  - Centralized canonical path containment (`resolveSafeExistingFile`, `safeDeleteFile`, `resolveSafeChildDirectory`, `isPathWithinDirectories`, `validateExistingUploadImage`) and ZIP archive verification (`validateZipUpload`) in `FileUploadSecurityService`.
+  - Fixed arbitrary file deletion in `StatusPostService::storeGalleryAssets()`, `StatusController::storeGalleryAssets()`, and `ForumController::deleteTopicAttachments()`.
+  - Fixed arbitrary local file disclosure in `StoreController::deliverShort()` / `MarketplaceExtensionFeedController::download()`, validated `linkzip` inputs, and fortified `StoreController::uploadZip()`.
+  - Eliminated admin `lang/{code}` path-traversal deletion (`base_path("lang/..")`) in `AdminController::deleteLanguage()` and language term handlers.
+  - Hardened remaining upload handlers (`BannerImageUploadService` removing SVG, `ProfileController`, `CommentController`, `GroupMembershipService`, `AdminController::storeNews`, `MessageController`, `OrderRequestController`, `AdminMediaController`), added `.phtml`/script blocking across `BlockSensitivePaths`, `index.php`, `public/index.php`, and `nginx-security.conf`, and prevented automatic `storage/installed` removal when `.env` is missing on already-installed sites (`InstallerGuard` fail-closed).
+
 ---
 
-*Last updated: 2026-11-16 — MYADS v4.7.1*
+*Last updated: 2026-11-25 — MYADS v4.7.2*
 
 
 

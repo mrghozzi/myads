@@ -3873,11 +3873,21 @@ class AdminController extends Controller
         $img = null;
         if ($request->hasFile('img')) {
             $file = $request->file('img');
-            // SECURITY: Use guessExtension() (based on real MIME type) instead of getClientOriginalExtension()
-            $extension = $file->guessExtension() ?: 'jpg';
-            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $extension;
-            $file->move(base_path('upload'), $filename);
-            $img = 'upload/' . $filename;
+            $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+            $validation = $securityService->validateImageUpload(
+                $file,
+                \App\Services\Security\FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS,
+                'news'
+            );
+
+            if (!$validation['valid']) {
+                return redirect()->back()->with('error', $validation['error'] ?: __('messages.invalid_file_type'))->withInput();
+            }
+
+            $destinationPath = base_path('upload');
+            \App\Services\Security\FileUploadSecurityService::ensureUploadDirectoryProtected($destinationPath);
+            $file->move($destinationPath, $validation['filename']);
+            $img = 'upload/' . $validation['filename'];
         }
         $news = new News();
         $news->name = $request->name;
@@ -5179,11 +5189,11 @@ class AdminController extends Controller
     public function storeLanguage(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'o_valuer' => 'required|string', // Language Code
+            'name' => 'required|string|max:100',
+            'o_valuer' => ['required', 'string', 'max:20', 'regex:/^[a-zA-Z]{2,5}(?:[_-][a-zA-Z0-9]{2,8})?$/'],
         ]);
 
-        $data = $request->all();
+        $data = $request->only(['name', 'o_valuer']);
         $code = strtolower(trim($data['o_valuer']));
         $data['o_valuer'] = $code;
         $data['o_type'] = 'languages';
@@ -5205,11 +5215,14 @@ class AdminController extends Controller
         $language = Option::findOrFail($id);
         
         $request->validate([
-            'name' => 'required|string',
-            'o_valuer' => 'required|string',
+            'name' => 'required|string|max:100',
+            'o_valuer' => ['required', 'string', 'max:20', 'regex:/^[a-zA-Z]{2,5}(?:[_-][a-zA-Z0-9]{2,8})?$/'],
         ]);
 
-        $language->update($request->all());
+        $language->update([
+            'name' => $request->input('name'),
+            'o_valuer' => trim((string) $request->input('o_valuer')),
+        ]);
 
         return redirect()->back()->with('success', __('messages.language_updated') ?? 'Language updated successfully');
     }
@@ -5217,10 +5230,15 @@ class AdminController extends Controller
     public function deleteLanguage($id)
     {
         $language = Option::findOrFail($id);
-        
-        $langPath = base_path("lang/{$language->o_valuer}");
-        if (File::exists($langPath) && $language->o_valuer !== 'en' && $language->o_valuer !== 'ar') {
-            File::deleteDirectory($langPath);
+        $code = trim((string) $language->o_valuer);
+
+        if ($code !== 'en' && $code !== 'ar') {
+            $safeLangPath = app(\App\Services\Security\FileUploadSecurityService::class)
+                ->resolveSafeChildDirectory($code, base_path('lang'));
+
+            if ($safeLangPath !== null) {
+                File::deleteDirectory($safeLangPath);
+            }
         }
         
         $language->delete();
@@ -5231,12 +5249,12 @@ class AdminController extends Controller
     public function editLanguageTerms($id)
     {
         $language = Option::findOrFail($id);
-        $code = $language->o_valuer;
-        $filePath = base_path("lang/{$code}/messages.php");
-        
+        $safeLangPath = app(\App\Services\Security\FileUploadSecurityService::class)
+            ->resolveSafeChildDirectory((string) $language->o_valuer, base_path('lang'));
+
         $terms = [];
-        if (File::exists($filePath)) {
-            $terms = require $filePath;
+        if ($safeLangPath !== null && File::exists($safeLangPath . '/messages.php')) {
+            $terms = require $safeLangPath . '/messages.php';
         }
 
         // We load English as fallback to show keys
@@ -5252,9 +5270,23 @@ class AdminController extends Controller
     public function updateLanguageTerms(Request $request, $id)
     {
         $language = Option::findOrFail($id);
-        $code = $language->o_valuer;
-        $filePath = base_path("lang/{$code}/messages.php");
-        
+        $code = trim((string) $language->o_valuer);
+        $securityService = app(\App\Services\Security\FileUploadSecurityService::class);
+        $safeLangPath = $securityService->resolveSafeChildDirectory($code, base_path('lang'));
+
+        if ($safeLangPath === null) {
+            if (!preg_match('/^[a-zA-Z]{2,5}(?:[_-][a-zA-Z0-9]{2,8})?$/', $code)) {
+                return redirect()->back()->with('error', __('messages.invalid_language_code') ?? 'Invalid language code.');
+            }
+            $candidateDir = base_path('lang/' . $code);
+            File::makeDirectory($candidateDir, 0755, true);
+            $safeLangPath = $securityService->resolveSafeChildDirectory($code, base_path('lang'));
+            if ($safeLangPath === null) {
+                return redirect()->back()->with('error', __('messages.invalid_language_code') ?? 'Invalid language code.');
+            }
+        }
+
+        $filePath = $safeLangPath . DIRECTORY_SEPARATOR . 'messages.php';
         $terms = $request->input('terms', []);
         
         $content = "<?php\n\nreturn [\n";
@@ -5264,10 +5296,6 @@ class AdminController extends Controller
             $content .= "    '{$key}' => '{$value}',\n";
         }
         $content .= "];\n";
-
-        if (!File::exists(dirname($filePath))) {
-            File::makeDirectory(dirname($filePath), 0755, true);
-        }
 
         File::put($filePath, $content);
 
