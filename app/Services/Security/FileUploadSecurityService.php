@@ -351,7 +351,8 @@ class FileUploadSecurityService
 
     /**
      * Inspect file content for executable PHP, ASP, or shell code signatures.
-     * Prevents image polyglot attacks where PHP payloads are appended to valid image files.
+     * Prevents image polyglot attacks where PHP payloads are embedded inside or appended to valid media files,
+     * while avoiding false positives on normal compressed binary streams.
      */
     public function containsExecutableCode(string $filePath): bool
     {
@@ -359,29 +360,37 @@ class FileUploadSecurityService
             return false;
         }
 
-        // Read up to 512KB of the file (or full file if smaller)
+        // Read first 512KB plus final 64KB tail (catching EOF-appended polyglots on large media)
         $handle = @fopen($filePath, 'rb');
         if (!$handle) {
             return false;
         }
 
         $sample = fread($handle, 524288);
+        $size = @filesize($filePath) ?: 0;
+        if ($size > 524288 && fseek($handle, max(0, $size - 65536)) === 0) {
+            $tail = fread($handle, 65536);
+            if (is_string($tail) && $tail !== '') {
+                $sample = ($sample ?: '') . "\n" . $tail;
+            }
+        }
         fclose($handle);
 
         if ($sample === false || $sample === '') {
             return false;
         }
 
-        // Patterns indicating embedded server-side executable code
+        // Patterns indicating embedded server-side executable code (requires printable script syntax,
+        // preventing false positives from random 3-byte binary sequences inside JPEG/PNG/MP4 streams)
         $dangerousPatterns = [
-            '/<\?php/i',
-            '/<\?=/i',
-            '/<\?\s+/i',
+            '/<\?php(?![a-zA-Z0-9_])/i',
+            '/<\?=(?=[\x09\x0A\x0D\x20-\x7E]{2,})(?:[^?]|\?(?!>)){0,200}(?:\?>|\$_(?:GET|POST|REQUEST|COOKIE|SERVER)|\$[a-zA-Z_]\w*|\b(?:eval|system|exec|shell_exec|passthru|proc_open|assert|phpinfo|print|echo)\s*\()/is',
+            '/<\?[\x20\x09\x0A\x0D]+(?:echo|print|eval|system|exec|shell_exec|passthru|proc_open|assert|include|require|include_once|require_once|phpinfo|\$_(?:GET|POST|REQUEST|COOKIE|SERVER)|\$[a-zA-Z_]\w*\s*=)/i',
             '/<\x00\?\x00p\x00h\x00p/i', // UTF-16 encoded <?php
             '/<\?\x00p\x00h\x00p/i',
             '/<script\s+language\s*=\s*["\']?php["\']?/i',
             '/__halt_compiler\s*\(/i',
-            '/<\%(=|\s+)/i', // ASP tags
+            '/<%[=@\x20]+[\x20-\x7E]{2,}(?:request|execute|response|script|\$|\?>|%>)/is',
         ];
 
         foreach ($dangerousPatterns as $pattern) {

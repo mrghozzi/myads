@@ -64,7 +64,10 @@ class V471SecurityHardeningTest extends TestCase
 
     public function test_valid_image_upload_generates_safe_random_filename_and_safe_extension(): void
     {
-        $realPngContent = "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4";
+        // Include binary sequences like 0x3C 0x3F 0x20 / 0x3C 0x3F 0x3D / 0x3C 0x25 0x20
+        // followed by non-ASCII pixel bytes that occur naturally in compressed PNG/JPEG streams.
+        $realPngContent = "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4"
+            . "\x3C\x3F\x20\x90\xFF\xAA\x3C\x3F\x3D\x80\xEE\x12\x3C\x25\x20\x99\xDE\xAD";
         $pngFile = UploadedFile::fake()->createWithContent('my_photo.png', $realPngContent);
 
         $result = $this->securityService->validateImageUpload($pngFile, FileUploadSecurityService::ALLOWED_IMAGE_EXTENSIONS, 'test_img');

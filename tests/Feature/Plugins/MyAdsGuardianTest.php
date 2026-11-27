@@ -384,4 +384,69 @@ class MyAdsGuardianTest extends TestCase
                 ->exists()
         );
     }
+
+    public function test_fim_does_not_false_positive_on_valid_binary_images_and_supports_admin_trust(): void
+    {
+        $testDirName = 'guardian_binary_test_' . time();
+        $testDir = base_path('upload/' . $testDirName);
+        $validPngRel = 'upload/' . $testDirName . '/photo.png';
+        $validPngAbs = base_path($validPngRel);
+        $polyglotJpgRel = 'upload/' . $testDirName . '/polyglot.jpg';
+        $polyglotJpgAbs = base_path($polyglotJpgRel);
+        $dropPhpRel = 'upload/' . $testDirName . '/shell.php';
+        $dropPhpAbs = base_path($dropPhpRel);
+
+        if (!is_dir($testDir)) {
+            @mkdir($testDir, 0755, true);
+        }
+
+        // Valid PNG bytes containing random 3-byte sequences (0x3C 0x3F 0x20, 0x3C 0x3F 0x3D, 0x3C 0x25 0x20)
+        // followed by non-ASCII pixel bytes that caused false positives in naive scanners.
+        $cleanPngBytes = "\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4"
+            . "\x3C\x3F\x20\x90\xFF\xAA\x3C\x3F\x3D\x80\xEE\x12\x3C\x25\x20\x99\xDE\xAD";
+        file_put_contents($validPngAbs, $cleanPngBytes);
+
+        // Real polyglot image with embedded PHP tag
+        file_put_contents($polyglotJpgAbs, "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00<?php echo 'poly'; ?>");
+
+        try {
+            $fim = app(GuardianFileIntegrityService::class);
+            $scan = $fim->scanIntegrity(['upload/' . $testDirName]);
+
+            $this->assertTrue($scan['success']);
+            $flaggedPaths = array_column($scan['suspicious'], 'path');
+            $this->assertNotContains($validPngRel, $flaggedPaths);
+            $this->assertContains($polyglotJpgRel, $flaggedPaths);
+
+            // Simulate an older false-positive 'suspicious' snapshot row and confirm scan heals it to 'verified'
+            \MyAds\Plugins\MyAdsGuardian\Models\GuardianFileSnapshot::where('path_hash', hash('sha256', $validPngRel))
+                ->update(['status' => 'suspicious']);
+
+            $rescan = $fim->scanIntegrity(['upload/' . $testDirName]);
+            $this->assertNotContains($validPngRel, array_column($rescan['suspicious'], 'path'));
+            $healedRow = \MyAds\Plugins\MyAdsGuardian\Models\GuardianFileSnapshot::where('path_hash', hash('sha256', $validPngRel))->first();
+            $this->assertSame('verified', $healedRow->status);
+
+            // Admin can mark non-executable files safe/trusted, while executable .php in upload/ is refused
+            file_put_contents($dropPhpAbs, "<?php echo 'test'; ?>");
+            $admin = $this->createSecurityAdmin(['security']);
+
+            $this->actingAs($admin)
+                ->post('/admin/guardian/fim/trust', ['file_path' => $validPngRel])
+                ->assertStatus(302)
+                ->assertSessionHas('success');
+
+            $this->actingAs($admin)
+                ->post('/admin/guardian/fim/trust', ['file_path' => $dropPhpRel])
+                ->assertStatus(302)
+                ->assertSessionHas('error');
+        } finally {
+            @unlink($validPngAbs);
+            @unlink($polyglotJpgAbs);
+            @unlink($dropPhpAbs);
+            if (is_dir($testDir)) {
+                @rmdir($testDir);
+            }
+        }
+    }
 }
